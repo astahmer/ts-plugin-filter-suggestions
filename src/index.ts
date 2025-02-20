@@ -1,11 +1,8 @@
 import * as ts from "typescript/lib/tsserverlibrary";
 import { resolvePluginConfig } from "./config";
 import { filterSuggestions } from "./filter-suggestions";
-import {
-	caretInImportSection,
-	findWordBoundary,
-	keepPreferredSourceOnly,
-} from "./utils";
+import { caretInImportSection, findWordBoundary } from "./utils";
+import { keepPreferredSourceOnly } from "./keep-preferred-source-only";
 
 // @ts-expect-error
 const isTest = process?.env?.["VITEST"];
