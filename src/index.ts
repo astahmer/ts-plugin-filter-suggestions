@@ -1,19 +1,19 @@
 import * as ts from "typescript/lib/tsserverlibrary";
 import { resolvePluginConfig } from "./config";
 import { filterSuggestions } from "./filter-suggestions";
-import { findWordAt, findWordBoundary } from "./find-word-boundary";
+import { findWordAt } from "./find-word-boundary";
 import { caretInImportSection } from "./caret-in-import-section";
 import { keepPreferredSourceOnly } from "./keep-preferred-source-only";
 
 // @ts-expect-error
 const isTest = process?.env?.["VITEST"];
-const enableLogs = isTest;
 
 function init(_modules: { typescript: typeof ts }) {
 	// const ts = modules.typescript;
 
 	function create(info: ts.server.PluginCreateInfo): ts.LanguageService {
 		const config = resolvePluginConfig(info.config);
+		const enableLogs = config.enableLogs ?? isTest ?? config.enableLogs;
 
 		const logger = info?.project?.projectService?.logger?.info
 			? (...args: any[]) => {
@@ -27,8 +27,10 @@ function init(_modules: { typescript: typeof ts }) {
 			: (...args: any[]) =>
 					enableLogs && console.log("[ts-intellisense-plugin]", ...args);
 
-		// Diagnostic logging
-		logger("init");
+		logger(
+			"init",
+			JSON.stringify({ resolvedConfig: config, passedConfig: info.config }),
+		);
 
 		const proxy: ts.LanguageService = Object.create(null);
 		Object.keys(info.languageService).forEach((key) => {
@@ -123,13 +125,18 @@ function init(_modules: { typescript: typeof ts }) {
 				logger("case:2:empty-suggestions");
 				return prior;
 			}
-			// logger('entries', prior.entries.length, JSON.stringify(prior.entries));
+			enableLogs === "debug" &&
+				logger(
+					"debug:entries",
+					prior.entries.length,
+					JSON.stringify(prior.entries),
+				);
 
 			if (
 				prior.entries.length >= config.filterIfMoreThanEntries &&
 				currentWordAtCaret.length <= config.filterIfLessThan
 			) {
-				logger("case:3:filter-suggestions");
+				logger("case:3:filter-suggestions", prior.entries.length);
 
 				prior.entries = filterSuggestions(
 					currentWordAtCaret,
@@ -137,34 +144,30 @@ function init(_modules: { typescript: typeof ts }) {
 					config,
 				);
 
-				// logger(
-				//     JSON.stringify(
-				//         {
-				//             count: prior.entries.length,
-				//             // filtered: prior.entries,
-				//         },
-				//         null,
-				//         2,
-				//     ),
-				//     JSON.stringify(prior.entries),
-				// );
-				return prior;
+				enableLogs === "debug" &&
+					logger(
+						"debug:entries:filtered",
+						JSON.stringify({ filtered: prior.entries }, null, 2),
+					);
+				logger("case:3:filtered", prior.entries.length);
 			} else {
 				logger("case:4:preserve-original-suggestions");
 			}
 
 			if (config.preferImportFrom.length) {
+				logger("case:5:prefer-import-from", prior.entries.length);
 				prior.entries = keepPreferredSourceOnly(
 					config.preferImportFrom,
 					prior.entries,
 					config.preferImportFromMode,
 				);
+				logger("case:5:filtered", prior.entries.length);
+			} else {
+				logger("case:6:preserve-current-suggestions", prior.entries.length);
 			}
 
 			return prior;
 		};
-
-		// prior.entries = prior.entries.filter((entry) => entry.source);
 
 		return proxy;
 	}

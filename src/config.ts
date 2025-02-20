@@ -18,6 +18,7 @@ export interface IntellisensePluginConfig {
 	includedGlobals?: string[];
 	shouldFilterWithStartIfLessThan?: number;
 	shouldFilterWithIncludesIfLessThan?: number;
+	enableLogs?: boolean | "info" | "debug";
 }
 
 export const resolvePluginConfig = (config: IntellisensePluginConfig) => {
@@ -36,6 +37,7 @@ export const resolvePluginConfig = (config: IntellisensePluginConfig) => {
 		excludeUnrelevantGlobals = true,
 		includedGlobals = defaultIncludedGlobals,
 		shouldFilterWithIncludesIfLessThan = 100, // = always
+		enableLogs = false,
 	} = config;
 
 	return {
@@ -53,6 +55,7 @@ export const resolvePluginConfig = (config: IntellisensePluginConfig) => {
 		excludeUnrelevantGlobals,
 		includedGlobals,
 		shouldFilterWithIncludesIfLessThan,
+		enableLogs,
 	} as Required<IntellisensePluginConfig>;
 };
 
