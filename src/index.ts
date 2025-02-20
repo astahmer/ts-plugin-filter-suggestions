@@ -5,7 +5,6 @@ import { findWordAt } from "./find-word-boundary";
 import { keepPreferredSourceOnly } from "./keep-preferred-source-only";
 import { findAncestor, getChildAtPos } from "./typescript.utils";
 
-// @ts-expect-error
 const isTest = process?.env?.["VITEST"];
 
 function init(_modules: { typescript: typeof ts }) {
@@ -13,7 +12,7 @@ function init(_modules: { typescript: typeof ts }) {
 
 	function create(info: ts.server.PluginCreateInfo): ts.LanguageService {
 		const config = resolvePluginConfig(info.config);
-		const enableLogs = config.enableLogs ?? isTest ?? config.enableLogs;
+		const enableLogs = config.enableLogs ?? isTest;
 
 		const logger = info?.project?.projectService?.logger?.info
 			? (...args: any[]) => {
@@ -101,6 +100,7 @@ function init(_modules: { typescript: typeof ts }) {
 				config.hideCompletionsForModuleExportsIfLessThan
 			);
 			// Enforce minimum length before suggesting externally exported symbols
+			// console.log(exportMapCache)
 			const prior = info.languageService.getCompletionsAtPosition(
 				fileName,
 				position,

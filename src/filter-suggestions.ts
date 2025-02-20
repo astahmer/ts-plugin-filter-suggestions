@@ -1,6 +1,9 @@
 import type ts from "typescript/lib/tsserverlibrary";
 import type { IntellisensePluginConfig } from "./config";
 
+const isDebug = false;
+const searched = "abcde";
+
 export const filterSuggestions = (
 	wordAtCaret: string,
 	entries: ts.CompletionEntry[],
@@ -28,6 +31,7 @@ export const filterSuggestions = (
 
 	return entries.filter((entry) => {
 		if (entry.kind === "keyword") {
+			isDebug && entry.name.includes(searched) && console.log(1);
 			return excludeOrSortLast(entry, config.keepKeywords);
 		}
 
@@ -43,6 +47,7 @@ export const filterSuggestions = (
 				entry.kind === "const" ||
 				entry.kind === "module")
 		) {
+			isDebug && entry.name.includes(searched) && console.log(2);
 			return excludeOrSortLast(entry, false);
 		}
 
@@ -50,6 +55,7 @@ export const filterSuggestions = (
 			config.excludeDeprecated &&
 			entry.kindModifiers?.includes("deprecated")
 		) {
+			isDebug && entry.name.includes(searched) && console.log(3);
 			return excludeOrSortLast(entry, false);
 		}
 
@@ -58,6 +64,7 @@ export const filterSuggestions = (
 				entry.source?.includes(pattern),
 			)
 		) {
+			isDebug && entry.name.includes(searched) && console.log(4);
 			return excludeOrSortLast(entry, false);
 		}
 
@@ -68,13 +75,19 @@ export const filterSuggestions = (
 			shouldFilterWithStartWith &&
 			!lowercaseEntryName.startsWith(lowercased)
 		) {
+			isDebug && entry.name.includes(searched) && console.log(5);
 			return excludeOrSortLast(entry, false);
 		}
 
 		// Short words needs to at least be included in the suggestions
 		if (shouldFilterWithIncludes && !lowercaseEntryName.includes(lowercased)) {
+			isDebug &&
+				entry.name.includes(searched) &&
+				console.log(6, { lowercaseEntryName, lowercased });
 			return excludeOrSortLast(entry, false);
 		}
+
+		isDebug && entry.name.includes(searched) && console.log(7);
 
 		return true;
 	});

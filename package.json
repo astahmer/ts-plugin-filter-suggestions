@@ -14,9 +14,13 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",
+		"@types/node": "22.13.4",
+		"@typescript/vfs": "1.6.0",
 		"vitest": "3.0.5"
 	},
-	"files": ["out"],
+	"files": [
+		"out"
+	],
 	"contributes": {
 		"typescriptServerPlugins": [
 			{

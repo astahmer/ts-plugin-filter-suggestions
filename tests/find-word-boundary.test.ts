@@ -123,4 +123,11 @@ test("findWordBoundary", () => {
 	expect(findWordBoundary(functionCall, 28, "start")).toBe(24);
 	expect(findWordBoundary(functionCall, 28, "end")).toBe(28);
 	expect(findWordAt(functionCall, 28)).toBe("1000");
+
+	const string = "const abcdef = 123;\nconsole.log(abcd)";
+	expect(showCaret(string, 36)).toMatchInlineSnapshot(`
+          "const abcdef = 123;
+          console.log(abcd|)"
+        `);
+	expect(findWordAt(string, 36)).toBe("abcd");
 });
