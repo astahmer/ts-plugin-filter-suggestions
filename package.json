@@ -1,24 +1,27 @@
 {
-    "name": "ts-plugin-filter-suggestions",
-    "description": "A TypeScript Language Service Plugin that allows configuring filters for suggestions",
-    "version": "0.0.1",
-    "main": "./out/index.js",
-    "scripts": {
-        "build": "tsc",
-        "watch": "tsc --watch",
-        "test": "echo \"Error: no test specified\" && exit 1"
-    },
-    "dependencies": {
-        "typescript": "^5.7.3"
-    },
-    "contributes": {
-        "typescriptServerPlugins": [
-            {
-                "name": "ts-plugin-filter-suggestions"
-            }
-        ]
-    },
-    "files": [
-        "out"
-    ]
+	"name": "ts-plugin-filter-suggestions",
+	"description": "A TypeScript Language Service Plugin that allows configuring filters for suggestions",
+	"version": "0.0.1",
+	"main": "./out/index.js",
+	"scripts": {
+		"build": "tsc",
+		"watch": "tsc --watch",
+		"test": "vitest",
+		"fmt": "pnpm biome check --fix --unsafe"
+	},
+	"dependencies": {
+		"typescript": "^5.7.3"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "1.9.4",
+		"vitest": "3.0.5"
+	},
+	"files": ["out"],
+	"contributes": {
+		"typescriptServerPlugins": [
+			{
+				"name": "ts-plugin-filter-suggestions"
+			}
+		]
+	}
 }
