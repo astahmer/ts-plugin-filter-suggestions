@@ -1,7 +1,8 @@
 import * as ts from "typescript/lib/tsserverlibrary";
 import { resolvePluginConfig } from "./config";
 import { filterSuggestions } from "./filter-suggestions";
-import { caretInImportSection, findWordBoundary } from "./utils";
+import { findWordAt, findWordBoundary } from "./find-word-boundary";
+import { caretInImportSection } from "./caret-in-import-section";
 import { keepPreferredSourceOnly } from "./keep-preferred-source-only";
 
 // @ts-expect-error
@@ -60,9 +61,7 @@ function init(_modules: { typescript: typeof ts }) {
 			if (!content) return;
 
 			const importPosition = caretInImportSection(content, position);
-			const wordStart = findWordBoundary(content, position, "start");
-			const wordEnd = findWordBoundary(content, position, "end");
-			const currentWordAtCaret = content.slice(wordStart, wordEnd).trim();
+			const currentWordAtCaret = findWordAt(content, position).trim();
 			logger(
 				JSON.stringify(
 					{ fileName, currentWordAtCaret, importPosition },
