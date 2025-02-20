@@ -1,9 +1,24 @@
 {
-    "name": "my-plugin",
+    "name": "ts-plugin-filter-suggestions",
+    "description": "A TypeScript Language Service Plugin that allows configuring filters for suggestions",
     "version": "0.0.1",
-    "license": "MIT",
-    "main": "./out",
+    "main": "./out/index.js",
+    "scripts": {
+        "build": "tsc",
+        "watch": "tsc --watch",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
     "dependencies": {
-        "typescript": "^4.4.3"
-    }
+        "typescript": "^5.7.3"
+    },
+    "contributes": {
+        "typescriptServerPlugins": [
+            {
+                "name": "ts-plugin-filter-suggestions"
+            }
+        ]
+    },
+    "files": [
+        "out"
+    ]
 }
