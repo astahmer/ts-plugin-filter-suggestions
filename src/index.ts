@@ -158,6 +158,7 @@ function init(_modules: { typescript: typeof ts }) {
 				prior.entries = keepPreferredSourceOnly(
 					config.preferImportFrom,
 					prior.entries,
+					config.preferImportFromMode,
 				);
 			}
 

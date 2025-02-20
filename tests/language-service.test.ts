@@ -97,38 +97,7 @@ function getCompletions(
 }
 
 describe("ts-plugin-filter-suggestions", () => {
-	it.skip("should filter global symbols when less than 3 characters are typed", () => {
-		const string = "const abcdef = 123;\nconsole.log(a";
-		const index = 21;
-		expect(
-			string.slice(0, index) + "|" + string.slice(index),
-		).toMatchInlineSnapshot(`
-          "const abcdef = 123;
-          c"
-        `);
-
-		const completions = getCompletions({ sourceCode: string, position: index });
-		expect(completions?.entries).toHaveLength(0);
-		// expect(completions?.entries.find((e) => e.name === 'console')).toBeUndefined();
-	});
-
-	it.skip("should not filter symbols when 3 or more characters are typed", () => {
-		const string = "const abcdef = 123;\nconsole.log(ab";
-		const index = 23;
-		expect(
-			string.slice(0, index) + "|" + string.slice(index),
-		).toMatchInlineSnapshot(`
-          "const abcdef = 123;
-          con"
-        `);
-
-		const completions = getCompletions({ sourceCode: string, position: index });
-		// expect(completions).toMatchInlineSnapshot();
-		expect(completions?.entries).toHaveLength(0);
-		// expect(completions?.entries.find((e) => e.name === 'abcdef')).toBeDefined();
-	});
-
-	it.only("should suggest symbols from current file if less than 5 characters", () => {
+	it("should suggest symbols from current file if less than 5 characters", () => {
 		const string = "const abcdef = 123;\nconsole.log(abcd)";
 		const index = 36;
 		expect(
