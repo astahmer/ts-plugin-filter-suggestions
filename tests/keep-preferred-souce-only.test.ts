@@ -113,7 +113,7 @@ describe("keepPreferredSourceOnly - exclude", () => {
 	});
 });
 
-describe("keepPreferredSourceOnly - exclude", () => {
+describe("keepPreferredSourceOnly - sort-last", () => {
 	const mode = "sort-last";
 
 	test("keepPreferredSourceOnly", () => {
@@ -133,25 +133,33 @@ describe("keepPreferredSourceOnly - exclude", () => {
 		);
 
 		expect(printSugggestions(result)).toMatchInlineSnapshot(`
-		[
-		  {
-		    "name": "readFile",
-		    "source": "node:fs/promises",
-		  },
-		  {
-		    "name": "writeFile",
-		    "source": "node:fs/promises",
-		  },
-		  {
-		    "name": "uniqueFunction",
-		    "source": "node:fs",
-		  },
-		  {
-		    "name": "otherFunction",
-		    "source": "other-module",
-		  },
-		]
-	`);
+			[
+			  {
+			    "name": "readFile",
+			    "source": "node:fs/promises",
+			  },
+			  {
+			    "name": "readFile",
+			    "source": "node:fs",
+			  },
+			  {
+			    "name": "writeFile",
+			    "source": "node:fs/promises",
+			  },
+			  {
+			    "name": "writeFile",
+			    "source": "node:fs",
+			  },
+			  {
+			    "name": "uniqueFunction",
+			    "source": "node:fs",
+			  },
+			  {
+			    "name": "otherFunction",
+			    "source": "other-module",
+			  },
+			]
+		`);
 	});
 
 	test("keepPreferredSourceOnly with multiple preferences", () => {
@@ -170,17 +178,25 @@ describe("keepPreferredSourceOnly - exclude", () => {
 		const result = keepPreferredSourceOnly(preferences, mockEntries, mode);
 
 		expect(printSugggestions(result)).toMatchInlineSnapshot(`
-		[
-		  {
-		    "name": "fn1",
-		    "source": "sourceB",
-		  },
-		  {
-		    "name": "fn2",
-		    "source": "sourceD",
-		  },
-		]
-	`);
+			[
+			  {
+			    "name": "fn1",
+			    "source": "sourceB",
+			  },
+			  {
+			    "name": "fn1",
+			    "source": "sourceA",
+			  },
+			  {
+			    "name": "fn2",
+			    "source": "sourceD",
+			  },
+			  {
+			    "name": "fn2",
+			    "source": "sourceC",
+			  },
+			]
+		`);
 	});
 
 	test("keepPreferredSourceOnly with no matching preferences", () => {
@@ -194,16 +210,16 @@ describe("keepPreferredSourceOnly - exclude", () => {
 		const result = keepPreferredSourceOnly(preferences, mockEntries, mode);
 
 		expect(printSugggestions(result)).toMatchInlineSnapshot(`
-		[
-		  {
-		    "name": "fn1",
-		    "source": "sourceA",
-		  },
-		  {
-		    "name": "fn2",
-		    "source": "sourceB",
-		  },
-		]
-	`);
+			[
+			  {
+			    "name": "fn1",
+			    "source": "sourceA",
+			  },
+			  {
+			    "name": "fn2",
+			    "source": "sourceB",
+			  },
+			]
+		`);
 	});
 });

@@ -21,30 +21,34 @@ export function keepPreferredSourceOnly(
 
 	let result: ts.CompletionEntry[] = [];
 	for (const [_name, suggestions] of Object.entries(grouped)) {
-		const preferred = suggestions.find(
-			(entry) =>
-				entry.source &&
-				preferenceMap.has(entry.source) &&
-				suggestions.some((s) => s.source === preferenceMap.get(entry.source!)),
-		);
-
 		if (preferMode === "exclude") {
+			const preferred = suggestions.find(
+				(entry) =>
+					entry.source &&
+					preferenceMap.has(entry.source) &&
+					suggestions.some(
+						(s) => s.source === preferenceMap.get(entry.source!),
+					),
+			);
 			result.push(preferred || suggestions[0]);
 		} else if (preferMode === "sort-last") {
-			result.push(
-				...suggestions.filter(
-					(entry) =>
-						entry.source ===
-						(preferred ? preferenceMap.get(entry.source!) : entry.source),
-				),
-			);
-			result.push(
-				...suggestions.filter(
-					(entry) =>
-						!preferenceMap.has(entry.source!) ||
-						entry.source === preferenceMap.get(entry.source!),
-				),
-			);
+			const preferred: ts.CompletionEntry[] = [];
+			const insteadOf: ts.CompletionEntry[] = [];
+			suggestions.forEach((suggestion) => {
+				if (
+					suggestion.source &&
+					preferenceMap.has(suggestion.source) &&
+					suggestions.some(
+						(s) => s.source === preferenceMap.get(suggestion.source!),
+					)
+				) {
+					preferred.push(suggestion);
+				} else {
+					insteadOf.push(suggestion);
+				}
+			});
+
+			result.push(...preferred, ...insteadOf);
 		}
 	}
 
