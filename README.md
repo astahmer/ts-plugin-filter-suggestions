@@ -1,10 +1,15 @@
-## A Template for a TypeScript Language Service Plugin
+https://bsky.app/profile/did:plc:rn2ur6nqbw5hddbbw2khckhw/post/3lijkzj5nvc25
+https://github.com/microsoft/vscode/issues/204535
+
+## Made from:
+
+### A Template for a TypeScript Language Service Plugin
 
 <img src="./docs/screenshot.png">
 
 This repo has two projects:
 
-- `/` is a TSServer Plugin 
+- `/` is a TSServer Plugin
 - `/example` is a TypeScript project which uses the root TSServer Plugin
 
 The source files for your project
