@@ -1,22 +1,23 @@
 {
-	"compilerOptions": {
-		// This matches the package name given in this package.json
-		"plugins": [
-			{
-				"name": "ts-plugin-filter-suggestions"
-			}
-		],
-		/* Visit https://aka.ms/tsconfig.json to read more about this file */
-		/* Projects */
-		/* Language and Environment */
-		"target": "es2017" /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */,
-		/* Modules */
-		"module": "commonjs" /* Specify what module code is generated. */,
-		/* Interop Constraints */
-		"esModuleInterop": true /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables `allowSyntheticDefaultImports` for type compatibility. */,
-		"forceConsistentCasingInFileNames": true /* Ensure that casing is correct in imports. */,
-		/* Type Checking */
-		"strict": true /* Enable all strict type-checking options. */,
-		"skipLibCheck": true /* Skip type checking all .d.ts files. */
-	}
+  "compilerOptions": {
+    // This matches the package name given in this package.json
+    "plugins": [
+      {
+        "name": "ts-plugin-filter-suggestions",
+        "enableLogs": true
+      }
+    ],
+    /* Visit https://aka.ms/tsconfig.json to read more about this file */
+    /* Projects */
+    /* Language and Environment */
+    "target": "es2017" /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */,
+    /* Modules */
+    "module": "commonjs" /* Specify what module code is generated. */,
+    /* Interop Constraints */
+    "esModuleInterop": true /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables `allowSyntheticDefaultImports` for type compatibility. */,
+    "forceConsistentCasingInFileNames": true /* Ensure that casing is correct in imports. */,
+    /* Type Checking */
+    "strict": true /* Enable all strict type-checking options. */,
+    "skipLibCheck": true /* Skip type checking all .d.ts files. */
+  }
 }
