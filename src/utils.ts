@@ -1,23 +1,3 @@
-import type ts from "typescript/lib/tsserverlibrary";
-import type { PreferImportFrom } from "./config";
-
-export function keepPreferredSourceOnly(
-	preferImportFrom: PreferImportFrom[],
-	entries: ts.CompletionEntry[],
-) {
-	const preferSources = new Map(
-		preferImportFrom.map((p) => [p.insteadOf, p.prefer]),
-	);
-
-	return entries.filter((entry) => {
-		const preferredSource = preferSources.get(entry.source ?? "");
-		if (!preferredSource) return true;
-		return entries.some(
-			(e) => e.name === entry.name && e.source === preferredSource,
-		);
-	});
-}
-
 const wordRegex = /\w/;
 export function findWordBoundary(
 	content: string,
