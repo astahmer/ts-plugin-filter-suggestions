@@ -1508,7 +1508,7 @@ test("shouldStartWithIfLessThan - 100 (always)", () => {
 		entries,
 		resolvePluginConfig({
 			keepKeywords: false,
-			shouldFilterWithStartIfLessThan: 100,
+			shouldFilterWithStartWithIfLessThan: 100,
 			shouldFilterWithIncludesIfLessThan: 0,
 		}),
 	);
@@ -1524,7 +1524,7 @@ test("shouldStartWithIfLessThan - 100 (always)", () => {
 		entries,
 		resolvePluginConfig({
 			keepKeywords: false,
-			shouldFilterWithStartIfLessThan: 0,
+			shouldFilterWithStartWithIfLessThan: 0,
 			shouldFilterWithIncludesIfLessThan: 0,
 		}),
 	);
@@ -1543,7 +1543,7 @@ test("shouldStartWithIfLessThan - 100 (always) - longer word", () => {
 		entries,
 		resolvePluginConfig({
 			keepKeywords: false,
-			shouldFilterWithStartIfLessThan: 100,
+			shouldFilterWithStartWithIfLessThan: 100,
 			shouldFilterWithIncludesIfLessThan: 0,
 		}),
 	);
@@ -1559,7 +1559,7 @@ test("shouldStartWithIfLessThan - 100 (always) - longer word", () => {
 		entries,
 		resolvePluginConfig({
 			keepKeywords: false,
-			shouldFilterWithStartIfLessThan: 0,
+			shouldFilterWithStartWithIfLessThan: 0,
 			shouldFilterWithIncludesIfLessThan: 0,
 		}),
 	);
@@ -1578,7 +1578,7 @@ test("shouldFilterWithIncludesIfLessThan - 100 (always)", () => {
 		entries,
 		resolvePluginConfig({
 			keepKeywords: false,
-			shouldFilterWithStartIfLessThan: 100,
+			shouldFilterWithStartWithIfLessThan: 100,
 			shouldFilterWithIncludesIfLessThan: 0,
 		}),
 	);
@@ -1597,7 +1597,7 @@ test("shouldFilterWithIncludesIfLessThan - 100 (always)", () => {
 		entries,
 		resolvePluginConfig({
 			keepKeywords: false,
-			shouldFilterWithStartIfLessThan: 0,
+			shouldFilterWithStartWithIfLessThan: 0,
 			shouldFilterWithIncludesIfLessThan: 0,
 		}),
 	);
@@ -1616,7 +1616,7 @@ test("shouldStartWithIfLessThan - 100 (always) - longer word - sort-last", () =>
 		entries,
 		resolvePluginConfig({
 			keepKeywords: false,
-			shouldFilterWithStartIfLessThan: 100,
+			shouldFilterWithStartWithIfLessThan: 100,
 			shouldFilterWithIncludesIfLessThan: 0,
 			filterMode: "sort-last",
 		}),
@@ -1633,7 +1633,7 @@ test("shouldStartWithIfLessThan - 100 (always) - longer word - sort-last", () =>
 		entries,
 		resolvePluginConfig({
 			keepKeywords: false,
-			shouldFilterWithStartIfLessThan: 0,
+			shouldFilterWithStartWithIfLessThan: 0,
 			shouldFilterWithIncludesIfLessThan: 0,
 			filterMode: "exclude",
 		}),
