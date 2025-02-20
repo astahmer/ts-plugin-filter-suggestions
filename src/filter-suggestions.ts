@@ -60,14 +60,18 @@ export const filterSuggestions = (
 			return excludeOrSortLast(entry, false);
 		}
 
+		const lowercaseEntryName = entry.name.toLowerCase();
+
 		// Super short words need to be at least start with the suggestions
-		// console.log(entry.name.startsWith(lowercased));
-		if (shouldFilterWithStartWith && !entry.name.startsWith(lowercased)) {
+		if (
+			shouldFilterWithStartWith &&
+			!lowercaseEntryName.startsWith(lowercased)
+		) {
 			return excludeOrSortLast(entry, false);
 		}
 
 		// Short words needs to at least be included in the suggestions
-		if (shouldFilterWithIncludes && !entry.name.includes(lowercased)) {
+		if (shouldFilterWithIncludes && !lowercaseEntryName.includes(lowercased)) {
 			return excludeOrSortLast(entry, false);
 		}
 
