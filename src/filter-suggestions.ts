@@ -27,8 +27,9 @@ export const filterSuggestions = (
 	};
 
 	return entries.filter((entry) => {
-		if (entry.kind === "keyword")
+		if (entry.kind === "keyword") {
 			return excludeOrSortLast(entry, config.keepKeywords);
+		}
 
 		// Ignore unrelevant globals
 		if (

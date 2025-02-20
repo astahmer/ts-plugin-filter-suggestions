@@ -2,8 +2,8 @@ import * as ts from "typescript/lib/tsserverlibrary";
 import { resolvePluginConfig } from "./config";
 import { filterSuggestions } from "./filter-suggestions";
 import { findWordAt } from "./find-word-boundary";
-import { caretInImportSection } from "./caret-in-import-section";
 import { keepPreferredSourceOnly } from "./keep-preferred-source-only";
+import { findAncestor, getChildAtPos } from "./typescript.utils";
 
 // @ts-expect-error
 const isTest = process?.env?.["VITEST"];
@@ -44,41 +44,42 @@ function init(_modules: { typescript: typeof ts }) {
 		// Hook into the getCompletionsAtPosition to filter suggestions
 		proxy.getCompletionsAtPosition = (fileName, position, options) => {
 			const program = info.languageService.getProgram();
-			// logger(
-			//     'getCompletionsAtPosition',
-			//     fileName,
-			//     position,
-			//     JSON.stringify(options, null, 2),
-			// );
-			// logger(
-			//     'getCompletionsAtPosition111',
-			//     JSON.stringify(
-			//         program?.getSourceFiles().map((x) => x.fileName),
-			//         null,
-			//         2,
-			//     ),
-			// );
 			const sourceFile = program?.getSourceFile(fileName);
+
 			const content = sourceFile?.getFullText();
-			if (!content) return;
+			if (!sourceFile || !content) return;
 
-			const importPosition = caretInImportSection(content, position);
-			const currentWordAtCaret = findWordAt(content, position).trim();
-			logger(
-				JSON.stringify(
-					{ fileName, currentWordAtCaret, importPosition },
-					null,
-					2,
-				),
-			);
+			const currentNode = getChildAtPos(sourceFile, position);
+			const importDeclaration = findAncestor(currentNode, (node) => {
+				enableLogs === "debug" &&
+					logger(
+						"node",
+						JSON.stringify({ kind: node.kind, text: node.getText() }, null, 2),
+					);
+				return node.kind === ts.SyntaxKind.ImportDeclaration;
+			});
 
-			if (importPosition !== "none") {
+			enableLogs === "debug" &&
+				logger(
+					"currentNode",
+					JSON.stringify({
+						position,
+						kind: currentNode?.kind,
+						text: currentNode?.getText(),
+					}),
+				);
+
+			if (importDeclaration) {
+				logger("case:0:in-import-declaration", importDeclaration.getText());
 				return info.languageService.getCompletionsAtPosition(
 					fileName,
 					position,
 					options,
 				);
 			}
+
+			const currentWordAtCaret = findWordAt(content, position).trim();
+			logger(JSON.stringify({ fileName, currentWordAtCaret }, null, 2));
 
 			// Don't suggest anything
 			if (
@@ -95,16 +96,19 @@ function init(_modules: { typescript: typeof ts }) {
 				};
 			}
 
+			const includeCompletionsForModuleExports = !(
+				currentWordAtCaret.length <=
+				config.hideCompletionsForModuleExportsIfLessThan
+			);
 			// Enforce minimum length before suggesting externally exported symbols
 			const prior = info.languageService.getCompletionsAtPosition(
 				fileName,
 				position,
 				{
 					...options,
-					includeCompletionsForModuleExports: !(
-						currentWordAtCaret.length <=
-						config.hideCompletionsForModuleExportsIfLessThan
-					),
+					includeCompletionsForModuleExports:
+						includeCompletionsForModuleExports,
+					includeExternalModuleExports: includeCompletionsForModuleExports,
 					useLabelDetailsInCompletionEntries:
 						typeof config.useLabelDetailsInCompletionEntriesIfLessThan ===
 						"boolean"
@@ -115,6 +119,7 @@ function init(_modules: { typescript: typeof ts }) {
 					// allowIncompleteCompletions
 				},
 			);
+			logger("entries:count", prior?.entries?.length);
 
 			logger(
 				JSON.stringify(
@@ -155,7 +160,7 @@ function init(_modules: { typescript: typeof ts }) {
 				enableLogs === "debug" &&
 					logger(
 						"debug:entries:filtered",
-						JSON.stringify({ filtered: prior.entries }, null, 2),
+						JSON.stringify({ filtered: prior.entries }),
 					);
 				logger("case:3:filtered", prior.entries.length);
 			} else {
@@ -173,6 +178,8 @@ function init(_modules: { typescript: typeof ts }) {
 			} else {
 				logger("case:6:preserve-current-suggestions", prior.entries.length);
 			}
+
+			prior.entries = prior.entries.slice(0, config.maxEntries);
 
 			return prior;
 		};
