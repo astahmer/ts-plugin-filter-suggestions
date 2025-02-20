@@ -8,7 +8,7 @@ export const filterSuggestions = (
 ) => {
 	const lowercased = wordAtCaret.toLowerCase();
 	const shouldFilterWithStartWith =
-		wordAtCaret.length <= config.shouldFilterWithStartIfLessThan;
+		wordAtCaret.length <= config.shouldFilterWithStartWithIfLessThan;
 	const shouldFilterWithIncludes =
 		wordAtCaret.length <= config.shouldFilterWithIncludesIfLessThan;
 

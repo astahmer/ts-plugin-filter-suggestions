@@ -105,6 +105,14 @@ function init(_modules: { typescript: typeof ts }) {
 						currentWordAtCaret.length <=
 						config.hideCompletionsForModuleExportsIfLessThan
 					),
+					useLabelDetailsInCompletionEntries:
+						typeof config.useLabelDetailsInCompletionEntriesIfLessThan ===
+						"boolean"
+							? config.useLabelDetailsInCompletionEntriesIfLessThan
+							: currentWordAtCaret.length <=
+								config.useLabelDetailsInCompletionEntriesIfLessThan,
+					// autoImportFileExcludePatterns <- already in VSCode settings
+					// allowIncompleteCompletions
 				},
 			);
 

@@ -1,57 +1,158 @@
-https://bsky.app/profile/did:plc:rn2ur6nqbw5hddbbw2khckhw/post/3lijkzj5nvc25
-https://github.com/microsoft/vscode/issues/204535
+Based on: https://bsky.app/profile/did:plc:rn2ur6nqbw5hddbbw2khckhw/post/3lijkzj5nvc25
 
-## Made from:
+Somewhat fixes: https://github.com/microsoft/vscode/issues/204535
 
-### A Template for a TypeScript Language Service Plugin
+You might also be interested in:
+https://github.com/tidalhq/ts-plugin-sort-import-suggestions
 
-<img src="./docs/screenshot.png">
+# ts-plugin-filter-suggestions
 
-This repo has two projects:
+A TypeScript plugin that allows configuring filters for suggestions provided by the TypeScript Language Server. It should be compatible with any IDE or editor that utilizes the TypeScript Language Server.
 
-- `/` is a TSServer Plugin
-- `/example` is a TypeScript project which uses the root TSServer Plugin
+|               | Before      |   After
+| -----------   | ----------- | ----------- |
+| Auto complete | TODO | TODO |
 
-The source files for your project
 
-#### Get Started
+## Setup
 
-Get the plugin working and your TS to JS converted as you save:
+- Install package
+
+```bash
+pnpm install ts-plugin-filter-suggestions
+```
+
+- Config `tsconfig.json`
+
+```json
+{
+    "compilerOptions": {
+    "plugins": [
+        {
+        "name": "ts-plugin-filter-suggestions",
+        //
+        }
+    ]
+    },
+}
+```
+
+- Config your Editor or IDE to use the TypeScript from node_modules (i.e. *Use Workspace Version* in VSCode from *TypeScript and JavaScript Language Features* Extension), otherwise TypeScript won't be able to load the plugin
+    - <img width="500" src="./assets/select-typescript-version.png" alt="select typescript version">
+    - <img width="500" src="./assets/use-workspace-version.png" alt="use workspace version">
+
+## Configuration
 
 ```ts
-git clone https://github.com/orta/TypeScript-TSServer-Plugin-Template
-cd TypeScript-TSServer-Plugin-Template
-
-# Install deps and run TypeScript
-npm i
-npx tsc --watch
+export interface IntellisensePluginConfig {
+	/**
+	 * Should we always keep keywords ?
+	 * @default true
+	 */
+	keepKeywords?: boolean;
+	/**
+	 * Will prevent ANY suggestions from showing if current word (found on the caret position) has <= X characters
+	 * @default 1
+	 */
+	hideSuggestionsIfLessThan?: number;
+	/**
+	 * Maps to `ts.GetCompletionsAtPositionOptions.includeCompletionsForModuleExports` to true if current word (found on the caret position) has <= X characters
+	 * @default 2
+	 * @see https://github.com/typescript-language-server/typescript-language-server/blob/184c60de3308621380469d6632bdff2e10f672fd/docs/configuration.md
+	 */
+	hideCompletionsForModuleExportsIfLessThan?: number;
+	/**
+	 * Maps to `ts.GetCompletionsAtPositionOptions.useLabelDetailsInCompletionEntries` to true if current word (found on the caret position) has <= X characters
+	 * @default 100 // = enabled by default
+	 * @see https://github.com/typescript-language-server/typescript-language-server/blob/184c60de3308621380469d6632bdff2e10f672fd/docs/configuration.md#:~:text=useLabelDetailsInCompletionEntries%20%5Bboolean%5D%20Indicates,Default%3A%20true
+	 */
+	useLabelDetailsInCompletionEntriesIfLessThan?: boolean;
+	/**
+	 * Removes (or move to the bottom) duplicated suggestions (same name, different source) from the completion list
+	 * @example
+	 * // You're typing `read|` and the suggestions are:
+	 * - `readFile` from `node:fs`
+	 * - `readFile` from `node:fs/promises`
+	 *
+	 * // with this option set to [{ prefer: "node:fs/promises", insteadOf: "node:fs" }] the suggestion `readFile` from `node:fs` will be removed
+	 * // so that only the `readFile` from `node:fs/promises` will be shown
+	 *
+	 * @default []
+	 */
+	preferImportFrom?: PreferImportFrom[];
+	/**
+	 * Allows to either completely remove duplicated suggestions (same name, different source) or move them last
+	 * @default "exclude"
+	 */
+	preferImportFromMode?: "exclude" | "sort-last";
+	/**
+	 * Allows to either completely remove filtered suggestions or move them last
+	 * @default "exclude"
+	 */
+	filterMode?: "exclude" | "sort-last";
+	/**
+	 * Filter suggestions if the current word (found on the caret position) has <= X characters
+	 * @default 4
+	 */
+	filterIfLessThan?: number;
+	/**
+	 * Filter suggestions only if the number of suggestions is >= X
+	 * @default 12
+	 */
+	filterIfMoreThanEntries?: number;
+	/**
+	 * Exclude suggestions from the completion list if the source contains any of the following strings
+	 *
+	 * @example
+	 * ```
+	 * excludeSourceIncluding: ["/dist/", "/build/", "/src/", "/fp/"]
+	 * ```
+	 *
+	 * will exclude suggestions from the completion list such as:
+	 * - import { flushAddSourceMiddleware } from '@segment/analytics-next/dist/types/core/buffer';
+	 * - import { startOfSecond } from 'date-fns/fp/startOfSecond';
+	 * - import { zodResolver } from '@hookform/resolvers/zod/src/zod.js';
+	 * - import { A } from 'vitest/dist/chunks/environment.LoooBwUu.js';
+	 * - import Ajv from 'ajv/dist/core';
+	 *
+	 * @default []
+	 */
+	excludeSourceIncluding?: string[];
+	/**
+	 * Anything marked as `@deprecated` will be excluded from the completion list
+	 * @default true
+	 */
+	excludeDeprecated?: boolean;
+	/**
+	 * Exclude globals that are not relevant for the current file
+	 *
+	 * a global is identified with `entry.kindModifier === declare && kind === declarations|var|alias|function|const|module`
+	 * @default true
+	 */
+	excludeUnrelevantGlobals?: boolean;
+	/**
+	 * Globals that SHOULD BE included (exceptions of `excludeUnrelevantGlobals`) in the completion list
+	 * @default ["Boolean", "Number", "String", "Symbol", "Object", "Function", "Array", "Date", "Error", "RegExp", "Map", "Set", "WeakMap", "WeakSet", "Int8Array", "Uint8Array", "Uint8ClampedArray", "Int16Array", "Uint16Array", "Int32Array", "Uint32Array", "Float32Array", "Float64Array", "BigInt64Array", "BigUint64Array", "console", "window", "document", "navigator", "history", "location", "screen", "alert", "confirm", "prompt", "print", "requestAnimationFrame", "cancelAnimationFrame", "requestIdleCallback", "cancelIdleCallback", "fetch", "Headers", "Request", "Response", "FormData", "FileReader", "FileList", "Blob", "URL", "URLSearchParams", "HTMLElement", "CSSStyleSheet", "CSSRule", "CSSRuleList", "AbortSignal", "AbortController", "__dirname", "__filename", "Blob"]`
+	 */
+	includedGlobals?: string[];
+	/**
+	 * Filter suggestions using `suggestion.name.toLowerCase().startsWith(currentWord.toLowerCase())` if the current word (found on the caret position) has <= X characters
+	 * @default 3
+	 */
+	shouldFilterWithStartWithIfLessThan?: number;
+	/**
+	 * Filter suggestions using `suggestion.name.toLowerCase().includes(currentWord.toLowerCase())` if the current word (found on the caret position) has <= X characters
+	 * @default 100 // = always
+	 */
+	shouldFilterWithIncludesIfLessThan?: number;
+	/**
+	 * Enables logs
+	 * @default false
+	 */
+	enableLogs?: boolean | "info" | "debug";
+}
 ```
 
-Next, get the example project up and running, it will load your TSServer Plugin from the emitted JavaScript.
+## Development
 
-```
-# Set up the host app to work in
-cd example
-npm i
-cd ..
-
-# Open one VS Code window to work on your plugin
-code .
-
-# Or to hook up a debugger, use this command
-# to have the TSServer wait till you attach:
-TSS_DEBUG_BRK=9559 code example
-
-# or use this to hook in later:
-TSS_DEBUG=9559 code example
-```
-
-You can then use the launch options in this root project to connect your debugger to the running TSServer in the other window. To see changes, run the command palette "TypeScript: Reload Project" to restart the TSServer for the project.
-
-Make sure that the TypeScript version on that project runs from your `node_modules` and not the version which is embedded in vscode. You can see the logs via the vscode command 'TypeScript: Open TS Server Logs." ( search for 'Loading tsserver-plugin' to see whether it loaded correctly. )
-
-### What Now?
-
-This project has a `debugger` statement inside the completions which will trigger on completions, you can get that running and then you have proven the toolset works and get started building your plugin.
-
-You can read up the docs on [Language Service Plugins in the TypeScript repo wiki](https://github.com/microsoft/TypeScript/wiki/Writing-a-Language-Service-Plugin#overview-writing-a-simple-plugin).
+Please refer to [TypeScript / Writing a TypeScript Plugin](https://github.com/microsoft/TypeScript/wiki/Writing-a-Language-Service-Plugin)
