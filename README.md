@@ -29,8 +29,42 @@ pnpm install ts-plugin-filter-suggestions
     "compilerOptions": {
     "plugins": [
         {
-        "name": "ts-plugin-filter-suggestions",
-        //
+			"name": "ts-plugin-filter-suggestions",
+			// use options from `IntellisensePluginConfig` here
+			// ...
+
+			// Defaults (everything is optional)
+			"keepKeywords": true,
+			"hideSuggestionsIfLessThan": 0,
+			"hideCompletionsForModuleExportsIfLessThan": 4,
+			"useLabelDetailsInCompletionEntriesIfLessThan": 100, // = always
+			"shouldFilterWithStartWithIfLessThan": -1,
+			"filterIfLessThan": 7,
+			"filterIfMoreThanEntries": 12, // 12 is the number of suggestions visible in the hover tooltip before
+			"preferImportFrom": [],
+			"preferImportFromMode": "exclude",
+			"filterMode": "exclude",
+			"excludeSourceIncluding": ["/dist/", "/build/", "/src/"],
+			"excludeDeprecated": true,
+			"excludeUnrelevantGlobals": true,
+			"includedGlobals": ["Boolean", "Number", "String", "Symbol", "Object", "Function", "Array", "Date", "Error", "RegExp", "Map", "Set", "WeakMap", "WeakSet", "Int8Array", "Uint8Array", "Uint8ClampedArray", "Int16Array", "Uint16Array", "Int32Array", "Uint32Array", "Float32Array", "Float64Array", "BigInt64Array", "BigUint64Array", "console", "window", "document", "navigator", "history", "location", "screen", "alert", "confirm", "prompt", "print", "requestAnimationFrame", "cancelAnimationFrame", "requestIdleCallback", "cancelIdleCallback", "fetch", "Headers", "Request", "Response", "FormData", "FileReader", "FileList", "Blob", "URL", "URLSearchParams", "HTMLElement", "CSSStyleSheet", "CSSRule", "CSSRuleList", "AbortSignal", "AbortController", "__dirname", "__filename", "Blob"],
+			"shouldFilterWithIncludesIfLessThan": 100,  // = always
+			"maxEntries": 150,
+			"enableLogs": false, // mostly for me & potential contributors
+
+			// Customization Example
+			"maxEntries": 50,
+			"filterIfLessThan": 6,
+			"preferImportFrom": [
+				{
+					"prefer": "node:fs/promises",
+					"insteadOf": "node:fs"
+				},
+				{
+					"prefer": "node:fs/promises",
+					"insteadOf": "fs"
+				},
+			],
         }
     ]
     },
@@ -44,6 +78,11 @@ pnpm install ts-plugin-filter-suggestions
 ## Configuration
 
 ```ts
+export interface PreferImportFrom {
+	prefer: string;
+	insteadOf: string;
+}
+
 export interface IntellisensePluginConfig {
 	/**
 	 * Should we always keep keywords ?
@@ -52,18 +91,24 @@ export interface IntellisensePluginConfig {
 	keepKeywords?: boolean;
 	/**
 	 * Will prevent ANY suggestions from showing if current word (found on the caret position) has <= X characters
-	 * @default 1
+	 * use `-1` to disable this option entirely
+	 * @default 0 // prevent suggestions if asking for suggestions in an empty string
 	 */
 	hideSuggestionsIfLessThan?: number;
 	/**
 	 * Maps to `ts.GetCompletionsAtPositionOptions.includeCompletionsForModuleExports` to true if current word (found on the caret position) has <= X characters
-	 * @default 2
+	 * use `-1` to disable this option entirely
+	 * This drastistically speeds up completions at the cost of only seeing suggestions related to the current file/globals/keywords
+	 *
+	 * @default 4
 	 * @see https://github.com/typescript-language-server/typescript-language-server/blob/184c60de3308621380469d6632bdff2e10f672fd/docs/configuration.md
 	 */
 	hideCompletionsForModuleExportsIfLessThan?: number;
 	/**
 	 * Maps to `ts.GetCompletionsAtPositionOptions.useLabelDetailsInCompletionEntries` to true if current word (found on the caret position) has <= X characters
-	 * @default 100 // = enabled by default
+	 * use `-1` to disable this option entirely
+	 *
+	 * @default 100 // = always enabled by default
 	 * @see https://github.com/typescript-language-server/typescript-language-server/blob/184c60de3308621380469d6632bdff2e10f672fd/docs/configuration.md#:~:text=useLabelDetailsInCompletionEntries%20%5Bboolean%5D%20Indicates,Default%3A%20true
 	 */
 	useLabelDetailsInCompletionEntriesIfLessThan?: boolean;
@@ -92,7 +137,7 @@ export interface IntellisensePluginConfig {
 	filterMode?: "exclude" | "sort-last";
 	/**
 	 * Filter suggestions if the current word (found on the caret position) has <= X characters
-	 * @default 4
+	 * @default 7
 	 */
 	filterIfLessThan?: number;
 	/**
@@ -137,20 +182,26 @@ export interface IntellisensePluginConfig {
 	includedGlobals?: string[];
 	/**
 	 * Filter suggestions using `suggestion.name.toLowerCase().startsWith(currentWord.toLowerCase())` if the current word (found on the caret position) has <= X characters
-	 * @default 3
+	 * @default -1 // = never, disabled by default
 	 */
 	shouldFilterWithStartWithIfLessThan?: number;
 	/**
 	 * Filter suggestions using `suggestion.name.toLowerCase().includes(currentWord.toLowerCase())` if the current word (found on the caret position) has <= X characters
-	 * @default 100 // = always
+	 * @default 100 // = always enabled by default
 	 */
 	shouldFilterWithIncludesIfLessThan?: number;
+	/**
+	 * Limits the number of suggestions returned
+	 * @default 150
+	 */
+	maxEntries?: number;
 	/**
 	 * Enables logs
 	 * @default false
 	 */
 	enableLogs?: boolean | "info" | "debug";
 }
+
 ```
 
 ## Development

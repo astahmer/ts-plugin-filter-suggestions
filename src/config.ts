@@ -12,7 +12,7 @@ export interface IntellisensePluginConfig {
 	/**
 	 * Will prevent ANY suggestions from showing if current word (found on the caret position) has <= X characters
 	 * use `-1` to disable this option entirely
-	 * @default 1
+	 * @default 0 // prevent suggestions if asking for suggestions in an empty string
 	 */
 	hideSuggestionsIfLessThan?: number;
 	/**
@@ -125,7 +125,7 @@ export interface IntellisensePluginConfig {
 export const resolvePluginConfig = (config: IntellisensePluginConfig) => {
 	const {
 		keepKeywords = true,
-		hideSuggestionsIfLessThan = 1,
+		hideSuggestionsIfLessThan = 0,
 		hideCompletionsForModuleExportsIfLessThan = 4,
 		useLabelDetailsInCompletionEntriesIfLessThan = 100, // = always
 		shouldFilterWithStartWithIfLessThan = -1,
@@ -140,7 +140,7 @@ export const resolvePluginConfig = (config: IntellisensePluginConfig) => {
 		includedGlobals = defaultIncludedGlobals,
 		shouldFilterWithIncludesIfLessThan = 100, // = always
 		maxEntries = 150,
-		enableLogs = false,
+		enableLogs,
 	} = config;
 
 	return {

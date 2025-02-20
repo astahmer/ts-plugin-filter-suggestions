@@ -1,11 +1,19 @@
 import * as ts from "typescript/lib/tsserverlibrary";
 import { describe, expect, it } from "vitest";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import type { IntellisensePluginConfig } from "../src/config";
 import plugin from "../src/index";
+import {
+	createFSBackedSystem,
+	createVirtualLanguageServiceHost,
+	createVirtualTypeScriptEnvironment,
+	type VirtualTypeScriptEnvironment,
+} from "@typescript/vfs";
 
 function getDefaultCompilerOptions(tsModule: typeof ts) {
 	const defaultCompilerOptions: ts.CompilerOptions = {
-		lib: ["lib.dom.d.ts", "lib.es2017.d.ts", "ESNext", "DOM"],
+		// lib: ["lib.dom.d.ts", "lib.es2017.d.ts", "ESNext", "DOM"],
 		types: ["node"],
 		target: tsModule.ScriptTarget.Latest,
 		moduleResolution: tsModule.ModuleResolutionKind.NodeJs,
@@ -16,73 +24,51 @@ function getDefaultCompilerOptions(tsModule: typeof ts) {
 	return defaultCompilerOptions;
 }
 
-function getLanguageService(
-	tsModule: typeof ts,
-	sourceCode: string,
-	options?: ts.CompilerOptions,
-) {
-	const defaultCompilerOptions = getDefaultCompilerOptions(tsModule);
-	const compilerOptions = { ...defaultCompilerOptions, ...options };
-	// const program = tsModule.createProgram(['mockFile.ts'], compilerOptions);
+const compilerOpts = getDefaultCompilerOptions(ts);
+const fsMap = new Map<string, string>();
 
-	const registry = tsModule.createDocumentRegistry(true);
-	const host: ts.LanguageServiceHost = {
-		getScriptSnapshot: () => ts.ScriptSnapshot.fromString(sourceCode),
-		getCompilationSettings: () => compilerOptions,
-		getCurrentDirectory: () => "/",
-		getScriptFileNames: () => ["mockFile.ts"],
-		getScriptVersion: () => "1",
-		fileExists: () => true,
-		readFile: () => sourceCode,
-		directoryExists: () => true,
-		getDirectories: () => [],
-		getDefaultLibFileName: () => "lib.d.ts",
-	};
-	const languageService = tsModule.createLanguageService(host, registry);
-	return languageService;
-}
+// By providing a project root, then the system knows how to resolve node_modules correctly
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const projectRoot = path.join(__dirname, "..");
+const system = createFSBackedSystem(fsMap, projectRoot, ts);
+
+const createLanguageServiceHost = (
+	env: VirtualTypeScriptEnvironment,
+): ts.LanguageServiceHost => {
+	return createVirtualLanguageServiceHost(
+		env.sys,
+		[...fsMap.keys()],
+		compilerOpts,
+		ts,
+	).languageServiceHost;
+};
+
+const mockFilename = "index.ts";
+fsMap.set(mockFilename, "");
 
 function getCompletions(
 	{ sourceCode, position }: { sourceCode: string; position: number },
 	options?: IntellisensePluginConfig,
 ) {
-	const sourceFile = ts.createSourceFile(
-		"mockFile.ts",
-		sourceCode,
-		ts.ScriptTarget.ESNext,
-	);
-	const originalLanguageService = getLanguageService(ts, sourceCode);
-	const patchedLanguageService = {
-		...originalLanguageService,
-		// @ts-expect-error
-		getProgram: () => ({ getSourceFile: () => sourceFile }) as ts.Program,
-		// getCompletionsAtPosition: (fileName: string, position: number, options: any) => {
-		//     console.log(1, fileName, position, options);
-		//     return {
-		//         entries: [],
-		//         isGlobalCompletion: false,
-		//         isMemberCompletion: false,
-		//         isIncomplete: true,
-		//     };
-		// },
-	};
+	// If using imports where the types don't directly match up to their FS representation (like the
+	// imports for node) then use triple-slash directives to make sure globals are set up first.
+	// const content = [`/// <reference types="node" />`, sourceCode].join("\n");
+	const content = sourceCode;
+	fsMap.set(mockFilename, content);
 
+	const env = createVirtualTypeScriptEnvironment(
+		system,
+		[mockFilename],
+		ts,
+		compilerOpts,
+	);
+
+	const languageServiceHost = createLanguageServiceHost(env);
 	const pluginInfo: ts.server.PluginCreateInfo = {
-		languageService: patchedLanguageService,
-		languageServiceHost: {
-			getDefaultLibFileName: () => "lib.d.ts",
-			getScriptSnapshot: () => ts.ScriptSnapshot.fromString(sourceCode),
-			getCompilationSettings: () => ({}),
-			getCurrentDirectory: () => "/",
-			getScriptFileNames: () => ["mockFile.ts"],
-			getScriptVersion: () => "1",
-			fileExists: () => true,
-			readFile: () => sourceCode,
-			directoryExists: () => true,
-			getDirectories: () => [],
-		},
-		serverHost: {} as any,
-		project: undefined as any,
+		languageService: env.languageService,
+		languageServiceHost: languageServiceHost,
+		serverHost: {} as never,
+		project: {} as never,
 		config: options ?? {},
 	};
 
@@ -90,28 +76,28 @@ function getCompletions(
 	const pluginLanguageService = pluginModule.create(pluginInfo);
 
 	return pluginLanguageService.getCompletionsAtPosition(
-		"mockFile.ts",
+		mockFilename,
 		position,
 		undefined,
 	);
 }
 
-describe("ts-plugin-filter-suggestions", () => {
-	it("should suggest symbols from current file if less than 5 characters", () => {
+function showCaret(text: string, index: number): string {
+	return text.slice(0, index) + "|" + text.slice(index);
+}
+
+describe("language-service", () => {
+	it.only("should suggest symbols from current file if less than 5 characters", () => {
 		const string = "const abcdef = 123;\nconsole.log(abcd)";
 		const index = 36;
-		expect(
-			string.slice(0, index) + "|" + string.slice(index),
-		).toMatchInlineSnapshot(`
+		expect(showCaret(string, 36)).toMatchInlineSnapshot(`
           "const abcdef = 123;
           console.log(abcd|)"
         `);
 
 		const completions = getCompletions(
 			{ sourceCode: string, position: index },
-			{
-				// filterIfLessThan: 0,
-			},
+			{},
 		);
 		expect(completions?.entries).toMatchInlineSnapshot(`
 			[
@@ -130,7 +116,7 @@ describe("ts-plugin-filter-suggestions", () => {
 			    "labelDetails": undefined,
 			    "name": "abcdef",
 			    "replacementSpan": undefined,
-			    "sortText": "15",
+			    "sortText": "11",
 			    "source": undefined,
 			    "sourceDisplay": undefined,
 			  },
@@ -526,7 +512,6 @@ describe("ts-plugin-filter-suggestions", () => {
 			  },
 			]
 		`);
-		// expect(completions?.entries).toHaveLength(0);
-		// expect(completions?.entries.find((e) => e.name === 'abcdef')).toBeDefined();
+		expect(completions?.entries.some((e) => e.name === "abcdef")).toBe(true);
 	});
 });
