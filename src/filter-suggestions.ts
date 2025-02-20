@@ -12,8 +12,23 @@ export const filterSuggestions = (
 	const shouldFilterWithIncludes =
 		wordAtCaret.length <= config.shouldFilterWithIncludesIfLessThan;
 
+	const shouldExclude = config.filterMode === "exclude";
+	const excludeOrSortLast = (
+		entry: ts.CompletionEntry,
+		conditional: boolean,
+	) => {
+		if (shouldExclude) return conditional;
+
+		if (!conditional) {
+			entry.sortText = entry.sortText + "1";
+		}
+
+		return true;
+	};
+
 	return entries.filter((entry) => {
-		if (entry.kind === "keyword") return config.keepKeywords;
+		if (entry.kind === "keyword")
+			return excludeOrSortLast(entry, config.keepKeywords);
 
 		// Ignore unrelevant globals
 		if (
@@ -27,14 +42,14 @@ export const filterSuggestions = (
 				entry.kind === "const" ||
 				entry.kind === "module")
 		) {
-			return false;
+			return excludeOrSortLast(entry, false);
 		}
 
 		if (
 			config.excludeDeprecated &&
 			entry.kindModifiers?.includes("deprecated")
 		) {
-			return false;
+			return excludeOrSortLast(entry, false);
 		}
 
 		if (
@@ -42,18 +57,18 @@ export const filterSuggestions = (
 				entry.source?.includes(pattern),
 			)
 		) {
-			return false;
+			return excludeOrSortLast(entry, false);
 		}
 
 		// Super short words need to be at least start with the suggestions
 		// console.log(entry.name.startsWith(lowercased));
 		if (shouldFilterWithStartWith && !entry.name.startsWith(lowercased)) {
-			return false;
+			return excludeOrSortLast(entry, false);
 		}
 
 		// Short words needs to at least be included in the suggestions
 		if (shouldFilterWithIncludes && !entry.name.includes(lowercased)) {
-			return false;
+			return excludeOrSortLast(entry, false);
 		}
 
 		return true;

@@ -1548,7 +1548,7 @@ test("shouldStartWithIfLessThan - 100 (always) - longer word", () => {
 		}),
 	);
 	expect(
-		suggestions.every((entry) => entry.name.toLowerCase().startsWith("us")),
+		suggestions.every((entry) => entry.name.toLowerCase().startsWith("entit")),
 	).toBe(true);
 	expect(
 		suggestions.some((entry) => entry.name === "TestEntitiesFactory"),
@@ -1583,7 +1583,7 @@ test("shouldFilterWithIncludesIfLessThan - 100 (always)", () => {
 		}),
 	);
 	expect(
-		suggestions.every((entry) => entry.name.toLowerCase().startsWith("us")),
+		suggestions.every((entry) => entry.name.toLowerCase().startsWith("entit")),
 	).toBe(true);
 	expect(
 		suggestions.some((entry) => entry.name === "TestEntitiesFactory"),
@@ -1608,4 +1608,41 @@ test("shouldFilterWithIncludesIfLessThan - 100 (always)", () => {
 	).toBe(true);
 
 	expect(suggestions.length < suggestionsWhenDisabled.length).toBe(true);
+});
+
+test("shouldStartWithIfLessThan - 100 (always) - longer word - sort-last", () => {
+	const suggestions = filterSuggestions(
+		"entit",
+		entries,
+		resolvePluginConfig({
+			keepKeywords: false,
+			shouldFilterWithStartIfLessThan: 100,
+			shouldFilterWithIncludesIfLessThan: 0,
+			filterMode: "sort-last",
+		}),
+	);
+	expect(
+		suggestions.every((entry) => entry.name.toLowerCase().startsWith("entit")),
+	).toBe(false);
+	expect(
+		suggestions.some((entry) => entry.name === "TestEntitiesFactory"),
+	).toBe(true);
+
+	const suggestionsWhenDisabled = filterSuggestions(
+		"entit",
+		entries,
+		resolvePluginConfig({
+			keepKeywords: false,
+			shouldFilterWithStartIfLessThan: 0,
+			shouldFilterWithIncludesIfLessThan: 0,
+			filterMode: "exclude",
+		}),
+	);
+	expect(
+		suggestionsWhenDisabled.some(
+			(entry) => entry.name === "TestEntitiesFactory",
+		),
+	).toBe(true);
+
+	expect(suggestions.length < suggestionsWhenDisabled.length).toBe(false);
 });
