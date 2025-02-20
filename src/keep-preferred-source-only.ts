@@ -12,7 +12,7 @@ export function keepPreferredSourceOnly(
 
 	const grouped = entries.reduce(
 		(acc, entry) => {
-			acc[entry.name] = acc[entry.name] || [];
+			if (!acc[entry.name]) acc[entry.name] = [];
 			acc[entry.name].push(entry);
 			return acc;
 		},
