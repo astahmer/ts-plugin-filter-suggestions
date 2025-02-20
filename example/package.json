@@ -1,7 +1,7 @@
 {
-    "name": "example-tsc-codebase",
-    "dependencies": {
-        "ts-plugin-filter-suggestions": "link:..",
-        "typescript": "*"
-    }
+	"name": "example-tsc-codebase",
+	"dependencies": {
+		"ts-plugin-filter-suggestions": "link:..",
+		"typescript": "*"
+	}
 }

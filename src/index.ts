@@ -1,54 +1,178 @@
-import * as ts from 'typescript/lib/tsserverlibrary';
+import * as ts from "typescript/lib/tsserverlibrary";
+import { resolvePluginConfig } from "./config";
+import { filterSuggestions } from "./filter-suggestions";
+import {
+	caretInImportSection,
+	findWordBoundary,
+	keepPreferredSourceOnly,
+} from "./utils";
 
-function init(modules: { typescript: typeof import("typescript/lib/tsserverlibrary") }) {
-    const ts = modules.typescript;
+// @ts-expect-error
+const isTest = process?.env?.["VITEST"];
+const enableLogs = isTest;
 
-    function create(info: ts.server.PluginCreateInfo) {
-      // Get a list of things to remove from the completion list from the config object.
-      // If nothing was specified, we'll just remove 'caller'
-      const whatToRemove: string[] = info.config.remove || ["caller"];
+function init(_modules: { typescript: typeof ts }) {
+	// const ts = modules.typescript;
 
-      // Diagnostic logging
-      info.project.projectService.logger.info(
-        "I'm getting set up now! Check the log for this message."
-      );
+	function create(info: ts.server.PluginCreateInfo): ts.LanguageService {
+		const config = resolvePluginConfig(info.config);
 
-      // Set up decorator object
-      const proxy: ts.LanguageService = Object.create(null);
-      for (let k of Object.keys(info.languageService) as Array<keyof ts.LanguageService>) {
-        const x = info.languageService[k]!;
-        // @ts-expect-error - JS runtime trickery which is tricky to type tersely
-        proxy[k] = (...args: Array<{}>) => x.apply(info.languageService, args);
-      }
+		const logger = info?.project?.projectService?.logger?.info
+			? (...args: any[]) => {
+					if (!enableLogs) return;
 
-      // Remove specified entries from completion list
-      proxy.getCompletionsAtPosition = (fileName, position, options) => {
-        // This is just to let you hook into something to
-        // see the debugger working
-        debugger
+					isTest && console.log("[ts-intellisense-plugin]", ...args);
+					return info.project.projectService.logger.info(
+						["[ts-intellisense-plugin-logger]", ...args].join(" "),
+					);
+				}
+			: (...args: any[]) =>
+					enableLogs && console.log("[ts-intellisense-plugin]", ...args);
 
-        const prior = info.languageService.getCompletionsAtPosition(fileName, position, options);
-        if (!prior) return
+		// Diagnostic logging
+		logger("init");
 
-        const oldLength = prior.entries.length;
-        prior.entries = prior.entries.filter(e => whatToRemove.indexOf(e.name) < 0);
+		const proxy: ts.LanguageService = Object.create(null);
+		Object.keys(info.languageService).forEach((key) => {
+			// @ts-expect-error
+			const member = info.languageService[key];
+			// @ts-expect-error
+			proxy[key] = (...args: Array<{}>) =>
+				member.apply(info.languageService, args);
+		});
 
-        // Sample logging for diagnostic purposes
-        if (oldLength !== prior.entries.length) {
-          const entriesRemoved = oldLength - prior.entries.length;
-          info.project.projectService.logger.info(
-            `Removed ${entriesRemoved} entries from the completion list`
-          );
-        }
+		// Hook into the getCompletionsAtPosition to filter suggestions
+		proxy.getCompletionsAtPosition = (fileName, position, options) => {
+			const program = info.languageService.getProgram();
+			// logger(
+			//     'getCompletionsAtPosition',
+			//     fileName,
+			//     position,
+			//     JSON.stringify(options, null, 2),
+			// );
+			// logger(
+			//     'getCompletionsAtPosition111',
+			//     JSON.stringify(
+			//         program?.getSourceFiles().map((x) => x.fileName),
+			//         null,
+			//         2,
+			//     ),
+			// );
+			const sourceFile = program?.getSourceFile(fileName);
+			const content = sourceFile?.getFullText();
+			if (!content) return;
 
-        return prior;
-      };
+			const importPosition = caretInImportSection(content, position);
+			const wordStart = findWordBoundary(content, position, "start");
+			const wordEnd = findWordBoundary(content, position, "end");
+			const currentWordAtCaret = content.slice(wordStart, wordEnd).trim();
+			logger(
+				JSON.stringify(
+					{ fileName, currentWordAtCaret, importPosition },
+					null,
+					2,
+				),
+			);
 
-      return proxy;
-    }
+			if (importPosition !== "none") {
+				return info.languageService.getCompletionsAtPosition(
+					fileName,
+					position,
+					options,
+				);
+			}
 
-    return { create };
-  }
+			// Don't suggest anything
+			if (
+				!currentWordAtCaret ||
+				currentWordAtCaret.length <= config.hideSuggestionsIfLessThan
+			) {
+				logger("case:1:hide-suggestions");
+				return {
+					entries: [],
+					isGlobalCompletion: true,
+					isMemberCompletion: false,
+					isNewIdentifierLocation: true,
+					isIncomplete: true,
+				};
+			}
 
-  export = init;
+			// Enforce minimum length before suggesting externally exported symbols
+			const prior = info.languageService.getCompletionsAtPosition(
+				fileName,
+				position,
+				{
+					...options,
+					includeCompletionsForModuleExports: !(
+						currentWordAtCaret.length <=
+						config.hideCompletionsForModuleExportsIfLessThan
+					),
+				},
+			);
 
+			logger(
+				JSON.stringify(
+					{
+						isGlobal: prior?.isGlobalCompletion,
+						isMember: prior?.isMemberCompletion,
+						isNewIdentifierLocation: prior?.isNewIdentifierLocation,
+						isIncomplete: prior?.isIncomplete,
+					},
+					null,
+					2,
+				),
+			);
+
+			if (!prior || prior.entries.length === 0) {
+				logger("case:2:empty-suggestions");
+				return prior;
+			}
+			// logger('entries', prior.entries.length, JSON.stringify(prior.entries));
+
+			if (
+				prior.entries.length >= config.filterIfMoreThanEntries &&
+				currentWordAtCaret.length <= config.filterIfLessThan
+			) {
+				logger("case:3:filter-suggestions");
+
+				prior.entries = filterSuggestions(
+					currentWordAtCaret,
+					prior.entries,
+					config,
+				);
+
+				// logger(
+				//     JSON.stringify(
+				//         {
+				//             count: prior.entries.length,
+				//             // filtered: prior.entries,
+				//         },
+				//         null,
+				//         2,
+				//     ),
+				//     JSON.stringify(prior.entries),
+				// );
+				return prior;
+			} else {
+				logger("case:4:preserve-original-suggestions");
+			}
+
+			if (config.preferImportFrom.length) {
+				prior.entries = keepPreferredSourceOnly(
+					config.preferImportFrom,
+					prior.entries,
+				);
+			}
+
+			return prior;
+		};
+
+		// prior.entries = prior.entries.filter((entry) => entry.source);
+
+		return proxy;
+	}
+
+	return { create };
+}
+
+export = init;
