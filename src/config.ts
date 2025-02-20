@@ -8,6 +8,8 @@ export interface IntellisensePluginConfig {
 	hideSuggestionsIfLessThan?: number;
 	hideCompletionsForModuleExportsIfLessThan?: number;
 	preferImportFrom?: PreferImportFrom[];
+	preferImportFromMode?: "exclude" | "sort-last";
+	filterMode?: "exclude" | "sort-last";
 	filterIfLessThan?: number;
 	filterIfMoreThanEntries?: number;
 	excludeSourceIncluding?: string[];
@@ -27,6 +29,8 @@ export const resolvePluginConfig = (config: IntellisensePluginConfig) => {
 		filterIfLessThan = 4,
 		filterIfMoreThanEntries = 12, // 12 is the number of suggestions visible in the hover tooltip before scrolling
 		preferImportFrom = [],
+		preferImportFromMode = "exclude",
+		filterMode = "exclude",
 		excludeSourceIncluding = ["/dist/", "/build/", "/src/"],
 		excludeDeprecated = true,
 		excludeUnrelevantGlobals = true,
@@ -42,6 +46,8 @@ export const resolvePluginConfig = (config: IntellisensePluginConfig) => {
 		filterIfLessThan,
 		filterIfMoreThanEntries,
 		preferImportFrom,
+		preferImportFromMode,
+		filterMode,
 		excludeSourceIncluding,
 		excludeDeprecated,
 		excludeUnrelevantGlobals,
