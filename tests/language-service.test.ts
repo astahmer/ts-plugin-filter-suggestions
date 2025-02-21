@@ -97,7 +97,7 @@ describe("language-service", () => {
 
 		const completions = getCompletions(
 			{ sourceCode: string, position: index },
-			{},
+			{ enableLogs: false },
 		);
 		expect(completions?.entries).toMatchInlineSnapshot(`
 			[

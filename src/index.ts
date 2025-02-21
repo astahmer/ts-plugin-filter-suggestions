@@ -99,8 +99,12 @@ function init(_modules: { typescript: typeof ts }) {
 				currentWordAtCaret.length <=
 				config.hideCompletionsForModuleExportsIfLessThan
 			);
+			logger(
+				"includeCompletionsForModuleExports",
+				includeCompletionsForModuleExports,
+			);
+
 			// Enforce minimum length before suggesting externally exported symbols
-			// console.log(exportMapCache)
 			const prior = info.languageService.getCompletionsAtPosition(
 				fileName,
 				position,
@@ -164,7 +168,18 @@ function init(_modules: { typescript: typeof ts }) {
 					);
 				logger("case:3:filtered", prior.entries.length);
 			} else {
-				logger("case:4:preserve-original-suggestions");
+				logger(
+					"case:4:preserve-original-suggestions",
+					JSON.stringify({
+						count: prior.entries.length,
+						filterIfMoreThanEntries: config.filterIfMoreThanEntries,
+						filterIfLessThan: config.filterIfLessThan,
+						currentWordAtCaret,
+						currentWordAtCaretLength: currentWordAtCaret.length,
+						firstCond: prior.entries.length >= config.filterIfMoreThanEntries,
+						secondCond: currentWordAtCaret.length <= config.filterIfLessThan,
+					}),
+				);
 			}
 
 			if (config.preferImportFrom.length) {
@@ -179,7 +194,9 @@ function init(_modules: { typescript: typeof ts }) {
 				logger("case:6:preserve-current-suggestions", prior.entries.length);
 			}
 
-			prior.entries = prior.entries.slice(0, config.maxEntries);
+			// idk this somehow prevents ANY suggestions from showing (instead of showing max X.. ?)
+			// prior.entries = prior.entries.slice(0, config.maxEntries);
+			logger("case:7:sliced", prior.entries.length);
 
 			return prior;
 		};
