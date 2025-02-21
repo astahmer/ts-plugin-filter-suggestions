@@ -87,7 +87,7 @@ function showCaret(text: string, index: number): string {
 }
 
 describe("language-service", () => {
-	it.only("should suggest symbols from current file if less than 5 characters", () => {
+	it("should suggest symbols from current file if less than 5 characters", () => {
 		const string = "const abcdef = 123;\nconsole.log(abcd)";
 		const index = 36;
 		expect(showCaret(string, 36)).toMatchInlineSnapshot(`
