@@ -9,9 +9,13 @@ https://github.com/tidalhq/ts-plugin-sort-import-suggestions
 
 A TypeScript plugin that allows configuring filters for suggestions provided by the TypeScript Language Server. It should be compatible with any IDE or editor that utilizes the TypeScript Language Server.
 
-|               | Before      |   After
-| -----------   | ----------- | ----------- |
-| Auto complete | ![image](https://github.com/user-attachments/assets/331ce393-6b23-44b3-9adb-75aee61e3051) | ![image](https://github.com/user-attachments/assets/379eeda1-65ab-4b58-9c0e-c25dc3a3c2d5) |
+| Before      |   After
+| ----------- | ----------- |
+| ![image](https://github.com/user-attachments/assets/331ce393-6b23-44b3-9adb-75aee61e3051) | ![image](https://github.com/user-attachments/assets/379eeda1-65ab-4b58-9c0e-c25dc3a3c2d5) |
+| ![image](https://github.com/user-attachments/assets/b74f8827-5da8-4500-96ca-2e56e0430ce6) | ![image](https://github.com/user-attachments/assets/17bf89fc-1a3f-4eb8-aa6d-bddb39dee9d7) |
+
+
+
 
 
 ## Setup
