@@ -5,6 +5,11 @@ Somewhat fixes: https://github.com/microsoft/vscode/issues/204535
 You might also be interested in:
 https://github.com/tidalhq/ts-plugin-sort-import-suggestions
 
+## VSCode  Extension
+
+Install the extension from the
+[Visual Studio Code Marketplace](https://marketplace.visualstudio.com/items?itemName=astahmer.vscode-ts-plugin-filter-suggestions).
+
 # ts-plugin-filter-suggestions
 
 A TypeScript plugin that allows configuring filters for suggestions provided by the TypeScript Language Server. It should be compatible with any IDE or editor that utilizes the TypeScript Language Server.
