@@ -11,7 +11,7 @@ A TypeScript plugin that allows configuring filters for suggestions provided by 
 
 |               | Before      |   After
 | -----------   | ----------- | ----------- |
-| Auto complete | TODO | TODO |
+| Auto complete | ![image](https://github.com/user-attachments/assets/331ce393-6b23-44b3-9adb-75aee61e3051) | ![image](https://github.com/user-attachments/assets/379eeda1-65ab-4b58-9c0e-c25dc3a3c2d5) |
 
 
 ## Setup
