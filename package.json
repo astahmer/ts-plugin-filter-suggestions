@@ -20,12 +20,5 @@
 	},
 	"files": [
 		"out"
-	],
-	"contributes": {
-		"typescriptServerPlugins": [
-			{
-				"name": "ts-plugin-filter-suggestions"
-			}
-		]
-	}
+	]
 }
