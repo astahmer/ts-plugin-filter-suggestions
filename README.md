@@ -49,11 +49,9 @@ pnpm install ts-plugin-filter-suggestions
 			"excludeUnrelevantGlobals": true,
 			"includedGlobals": ["Boolean", "Number", "String", "Symbol", "Object", "Function", "Array", "Date", "Error", "RegExp", "Map", "Set", "WeakMap", "WeakSet", "Int8Array", "Uint8Array", "Uint8ClampedArray", "Int16Array", "Uint16Array", "Int32Array", "Uint32Array", "Float32Array", "Float64Array", "BigInt64Array", "BigUint64Array", "console", "window", "document", "navigator", "history", "location", "screen", "alert", "confirm", "prompt", "print", "requestAnimationFrame", "cancelAnimationFrame", "requestIdleCallback", "cancelIdleCallback", "fetch", "Headers", "Request", "Response", "FormData", "FileReader", "FileList", "Blob", "URL", "URLSearchParams", "HTMLElement", "CSSStyleSheet", "CSSRule", "CSSRuleList", "AbortSignal", "AbortController", "__dirname", "__filename", "Blob"],
 			"shouldFilterWithIncludesIfLessThan": 100,  // = always
-			"maxEntries": 150,
 			"enableLogs": false, // mostly for me & potential contributors
 
 			// Customization Example
-			"maxEntries": 50,
 			"filterIfLessThan": 6,
 			"preferImportFrom": [
 				{
@@ -190,11 +188,6 @@ export interface IntellisensePluginConfig {
 	 * @default 100 // = always enabled by default
 	 */
 	shouldFilterWithIncludesIfLessThan?: number;
-	/**
-	 * Limits the number of suggestions returned
-	 * @default 150
-	 */
-	maxEntries?: number;
 	/**
 	 * Enables logs
 	 * @default false

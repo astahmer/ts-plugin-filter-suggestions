@@ -1,3 +1,5 @@
+// TODO https://github.com/yioneko/vtsls/blob/3a33710f604aae6fc7fa9d8f65c1fd0e69a2a2e2/packages/service/configuration.schema.json#L2
+
 export interface PreferImportFrom {
 	prefer: string;
 	insteadOf: string;
@@ -114,7 +116,7 @@ export interface IntellisensePluginConfig {
 	 * Limits the number of suggestions returned
 	 * @default 150
 	 */
-	maxEntries?: number;
+	// maxEntries?: number;
 	/**
 	 * Enables logs
 	 * @default false
@@ -139,7 +141,7 @@ export const resolvePluginConfig = (config: IntellisensePluginConfig) => {
 		excludeUnrelevantGlobals = true,
 		includedGlobals = defaultIncludedGlobals,
 		shouldFilterWithIncludesIfLessThan = 100, // = always
-		maxEntries = 150,
+		// maxEntries = 150,
 		enableLogs,
 	} = config;
 
@@ -159,7 +161,7 @@ export const resolvePluginConfig = (config: IntellisensePluginConfig) => {
 		excludeUnrelevantGlobals,
 		includedGlobals,
 		shouldFilterWithIncludesIfLessThan,
-		maxEntries,
+		// maxEntries,
 		enableLogs,
 	} as Required<IntellisensePluginConfig>;
 };
