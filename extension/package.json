@@ -10,7 +10,7 @@
 		"url": "https://github.com/astahmer/ts-plugin-filter-suggestions"
 	},
 	"engines": {
-		"vscode": "^1.95.0"
+		"vscode": "^1.97.0"
 	},
 	"activationEvents": [
 		"onStartupFinished"
@@ -27,22 +27,24 @@
 		"out",
 		"package.json",
 		"LICENSE",
-		"assets",
 		"README.md"
 	],
 	"scripts": {
 		"vscode:prepublish": "pnpm run build",
-		"build": "tsc -p ./",
-		"watch": "tsc -watch -p ./",
-		"package": "pnpm vsce package --allow-unused-files-pattern",
-		"vsce:publish": "pnpm vsce publish --allow-unused-files-pattern"
+		"build": "tsup src/extension.ts --external vscode",
+		"watch": "pnpm build --watch --sourcemap",
+		"vsce:pack": "pnpm vsix-builder package --out ./ext.vsix",
+		"vsce:publish": "vsce publish --no-dependencies --packagePath ./ext.vsix"
 	},
-	"dependencies": {
-		"ts-plugin-filter-suggestions": "link:.."
-	},
+	"bundledDependencies": [
+		"ts-plugin-filter-suggestions"
+	],
 	"devDependencies": {
-		"@types/vscode": "^1.95.0",
+		"@pandacss/vsix-builder": "^0.18.0",
+		"@types/vscode": "^1.97.0",
 		"@vscode/vsce": "^3.2.1",
+		"ts-plugin-filter-suggestions": "0.0.1",
+		"tsup": "^8.3.6",
 		"typescript": "^5.7.3"
 	},
 	"__icon": "assets/logo.png",
