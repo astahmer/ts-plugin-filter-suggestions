@@ -16,18 +16,19 @@ function init(_modules: { typescript: typeof ts }) {
 	function create(info: ts.server.PluginCreateInfo): ts.LanguageService {
 		config = resolvePluginConfig(info.config);
 		const enableLogs = config.enableLogs ?? isTest;
+		// const enableLogs = true;
 
 		logger = info?.project?.projectService?.logger?.info
 			? (...args: any[]) => {
 					if (!enableLogs) return;
 
-					isTest && console.log("[ts-intellisense-plugin]", ...args);
+					isTest && console.log("[ts-plugin-filter-suggestions]", ...args);
 					return info.project.projectService.logger.info(
-						["[ts-intellisense-plugin-logger]", ...args].join(" "),
+						["[ts-plugin-filter-suggestions-logger]", ...args].join(" "),
 					);
 				}
 			: (...args: any[]) =>
-					enableLogs && console.log("[ts-intellisense-plugin]", ...args);
+					enableLogs && console.log("[ts-plugin-filter-suggestions]", ...args);
 
 		logger(
 			"init",
@@ -277,6 +278,7 @@ function init(_modules: { typescript: typeof ts }) {
 
 	function onConfigurationChanged(newConfig: IntellisensePluginConfig) {
 		logger("onConfigurationChanged", JSON.stringify(newConfig));
+		// [ts-plugin-filter-suggestions-logger] init
 		config = resolvePluginConfig(newConfig);
 	}
 

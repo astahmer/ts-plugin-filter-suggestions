@@ -9,7 +9,7 @@ const getFreshSettings = () => {
 // https://code.visualstudio.com/api/references/contribution-points#Plugin-configuration
 export async function activate(context: vscode.ExtensionContext) {
 	const log = (...args: any[]) =>
-		console.log("[vscode-ts-intellisense-plugin]", ...args);
+		console.log("[vscode-ts-plugin-filter-suggestions]", ...args);
 
 	const tsApi = await getTsApi();
 	if (!tsApi) {
@@ -17,14 +17,17 @@ export async function activate(context: vscode.ExtensionContext) {
 		return;
 	}
 
+	const settings = getFreshSettings();
+	tsApi.configurePlugin("ts-plugin-filter-suggestions", settings);
+
 	context.subscriptions.push(
 		vscode.workspace.onDidChangeConfiguration((update) => {
 			log("onDidChangeConfiguration", update);
 			if (!tsApi) return;
 
 			const settings = getFreshSettings();
-			console.log({ settings, update });
-			tsApi.configurePlugin("@pandacss/ts-plugin", settings);
+			console.log(settings);
+			tsApi.configurePlugin("ts-plugin-filter-suggestions", settings);
 		}),
 	);
 }

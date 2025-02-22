@@ -10,6 +10,32 @@
             "request": "attach",
             "name": "Attach to VS Code TS Server via Port",
             "processId": "${command:PickProcess}",
-        }
+            "port": 9559,
+            "restart": true,
+            // "outFiles": ["${workspaceFolder}/out/**/*.js"],
+            "skipFiles": [
+                "<node_internals>/**"
+            ]
+        },
+        {
+            "name": "Run Extension",
+            "type": "extensionHost",
+            "request": "launch",
+            "args": [
+                "--disable-updates",
+                "--disable-workspace-trust",
+                "--profile-temp",
+                "--skip-release-notes",
+                "--skip-welcome",
+                "--extensionDevelopmentPath=${workspaceFolder}/extension",
+                "--folder-uri=${workspaceRoot}/example"
+            ],
+            "outFiles": [
+                "${workspaceFolder}/extension/out/**/*.js"
+            ],
+            "env": {
+                "TSS_DEBUG": "9559"
+            }
+        },
     ]
 }
