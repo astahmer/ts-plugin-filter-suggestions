@@ -5,7 +5,7 @@
 	"main": "./out/index.js",
 	"scripts": {
 		"build": "tsc",
-		"watch": "tsc --watch",
+		"dev": "tsc --watch",
 		"test": "vitest",
 		"fmt": "pnpm biome check --fix --unsafe",
 		"prepublishOnly": "npm run build",
