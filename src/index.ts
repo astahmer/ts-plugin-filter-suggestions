@@ -275,7 +275,12 @@ function init(_modules: { typescript: typeof ts }) {
 		return proxy;
 	}
 
-	return { create };
+	function onConfigurationChanged(newConfig: IntellisensePluginConfig) {
+		logger("onConfigurationChanged", JSON.stringify(newConfig));
+		config = resolvePluginConfig(newConfig);
+	}
+
+	return { create, onConfigurationChanged };
 }
 
 export = init;

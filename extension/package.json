@@ -21,7 +21,197 @@
 				"name": "ts-plugin-filter-suggestions",
 				"enableForWorkspaceTypeScriptVersions": true
 			}
-		]
+		],
+		"configuration": {
+			"title": "ts-plugin-filter-suggestions",
+			"properties": {
+				"contributes": {
+					"configuration": {
+						"title": "ts-plugin-filter-suggestions",
+						"properties": {
+							"ts-plugin-filter-suggestions.keepKeywords": {
+								"type": "boolean",
+								"default": true,
+								"description": "Should we always keep keywords?"
+							},
+							"ts-plugin-filter-suggestions.hideSuggestionsIfLessThan": {
+								"type": "number",
+								"default": 0,
+								"description": "Will prevent ANY suggestions from showing if current word has <= X characters. Use -1 to disable."
+							},
+							"ts-plugin-filter-suggestions.hideCompletionsForModuleExportsIfLessThan": {
+								"type": "number",
+								"default": 4,
+								"description": "Only show suggestions related to current file/globals/keywords if current word has <= X characters. Use -1 to disable."
+							},
+							"ts-plugin-filter-suggestions.useLabelDetailsInCompletionEntriesIfLessThan": {
+								"type": "boolean",
+								"default": true,
+								"description": "Enable label details in completion entries if current word has <= X characters."
+							},
+							"ts-plugin-filter-suggestions.preferImportFrom": {
+								"type": "array",
+								"items": {
+									"type": "object",
+									"properties": {
+										"prefer": {
+											"type": "string"
+										},
+										"insteadOf": {
+											"type": "string"
+										}
+									}
+								},
+								"default": [],
+								"description": "Specify preferred import sources to handle duplicate suggestions"
+							},
+							"ts-plugin-filter-suggestions.preferImportFromMode": {
+								"type": "string",
+								"enum": [
+									"exclude",
+									"sort-last"
+								],
+								"default": "exclude",
+								"description": "How to handle duplicate suggestions from different sources"
+							},
+							"ts-plugin-filter-suggestions.filterMode": {
+								"type": "string",
+								"enum": [
+									"exclude",
+									"sort-last"
+								],
+								"default": "exclude",
+								"description": "How to handle filtered suggestions"
+							},
+							"ts-plugin-filter-suggestions.filterIfLessThan": {
+								"type": "number",
+								"default": 7,
+								"description": "Filter suggestions if current word has <= X characters"
+							},
+							"ts-plugin-filter-suggestions.filterIfMoreThanEntries": {
+								"type": "number",
+								"default": 12,
+								"description": "Filter suggestions only if number of suggestions is >= X"
+							},
+							"ts-plugin-filter-suggestions.excludeSourceIncluding": {
+								"type": "array",
+								"items": {
+									"type": "string"
+								},
+								"default": [
+									"/dist/",
+									"/build/",
+									"/src/"
+								],
+								"description": "Exclude suggestions if source contains any of these strings"
+							},
+							"ts-plugin-filter-suggestions.excludeDeprecated": {
+								"type": "boolean",
+								"default": true,
+								"description": "Exclude deprecated items from suggestions"
+							},
+							"ts-plugin-filter-suggestions.excludeUnrelevantGlobals": {
+								"type": "boolean",
+								"default": true,
+								"description": "Exclude globals not relevant for current file"
+							},
+							"ts-plugin-filter-suggestions.includedGlobals": {
+								"type": "array",
+								"items": {
+									"type": "string"
+								},
+								"default": [
+									"Boolean",
+									"Number",
+									"String",
+									"Symbol",
+									"Object",
+									"Function",
+									"Array",
+									"Date",
+									"Error",
+									"RegExp",
+									"Map",
+									"Set",
+									"WeakMap",
+									"WeakSet",
+									"Int8Array",
+									"Uint8Array",
+									"Uint8ClampedArray",
+									"Int16Array",
+									"Uint16Array",
+									"Int32Array",
+									"Uint32Array",
+									"Float32Array",
+									"Float64Array",
+									"BigInt64Array",
+									"BigUint64Array",
+									"console",
+									"window",
+									"document",
+									"navigator",
+									"history",
+									"location",
+									"screen",
+									"alert",
+									"confirm",
+									"prompt",
+									"print",
+									"requestAnimationFrame",
+									"cancelAnimationFrame",
+									"requestIdleCallback",
+									"cancelIdleCallback",
+									"fetch",
+									"Headers",
+									"Request",
+									"Response",
+									"FormData",
+									"FileReader",
+									"FileList",
+									"Blob",
+									"URL",
+									"URLSearchParams",
+									"HTMLElement",
+									"CSSStyleSheet",
+									"CSSRule",
+									"CSSRuleList",
+									"AbortSignal",
+									"AbortController",
+									"__dirname",
+									"__filename",
+									"Blob"
+								],
+								"description": "Globals that should be included in suggestions"
+							},
+							"ts-plugin-filter-suggestions.shouldFilterWithStartWithIfLessThan": {
+								"type": "number",
+								"default": -1,
+								"description": "Filter using startsWith if current word has <= X characters. -1 to disable."
+							},
+							"ts-plugin-filter-suggestions.shouldFilterWithIncludesIfLessThan": {
+								"type": "number",
+								"default": 100,
+								"description": "Filter using includes if current word has <= X characters"
+							},
+							"ts-plugin-filter-suggestions.enableLogs": {
+								"type": [
+									"boolean",
+									"string"
+								],
+								"enum": [
+									true,
+									false,
+									"info",
+									"debug"
+								],
+								"default": false,
+								"description": "Enable logging"
+							}
+						}
+					}
+				}
+			}
+		}
 	},
 	"files": [
 		"out",
