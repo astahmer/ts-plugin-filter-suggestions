@@ -1,5 +1,5 @@
 import * as ts from "typescript/lib/tsserverlibrary";
-import { describe, expect, it } from "vitest";
+import { describe, expect, test } from "vitest";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import type { IntellisensePluginConfig } from "../src/config";
@@ -86,20 +86,19 @@ function showCaret(text: string, index: number): string {
 	return text.slice(0, index) + "|" + text.slice(index);
 }
 
-describe("language-service", () => {
-	it("should suggest symbols from current file if less than 5 characters", () => {
-		const string = "const abcdef = 123;\nconsole.log(abcd)";
-		const index = 36;
-		expect(showCaret(string, 36)).toMatchInlineSnapshot(`
+test("should suggest symbols from current file if less than 5 characters", () => {
+	const string = "const abcdef = 123;\nconsole.log(abcd)";
+	const index = 36;
+	expect(showCaret(string, 36)).toMatchInlineSnapshot(`
           "const abcdef = 123;
           console.log(abcd|)"
         `);
 
-		const completions = getCompletions(
-			{ sourceCode: string, position: index },
-			{ enableLogs: false },
-		);
-		expect(completions?.entries).toMatchInlineSnapshot(`
+	const completions = getCompletions(
+		{ sourceCode: string, position: index },
+		{ enableLogs: false },
+	);
+	expect(completions?.entries).toMatchInlineSnapshot(`
 			[
 			  {
 			    "commitCharacters": undefined,
@@ -512,6 +511,294 @@ describe("language-service", () => {
 			  },
 			]
 		`);
-		expect(completions?.entries.some((e) => e.name === "abcdef")).toBe(true);
+	expect(completions?.entries.some((e) => e.name === "abcdef")).toBe(true);
+});
+
+test("should have native suggestions if caret inside a string", () => {
+	const string = `
+		type Role = "admin" | "user";
+		const role: Role = {} as Role;
+		console.log(role === "");
+		`;
+	const index = string.length - 6;
+	expect(showCaret(string, index)).toMatchInlineSnapshot(`
+			"
+					type Role = "admin" | "user";
+					const role: Role = {} as Role;
+					console.log(role === "|");
+					"
+		`);
+
+	const completions = getCompletions(
+		{ sourceCode: string, position: index },
+		{ enableLogs: false },
+	);
+
+	expect(completions?.entries).toMatchInlineSnapshot(`
+			[
+			  {
+			    "commitCharacters": [],
+			    "kind": "string",
+			    "kindModifiers": "",
+			    "name": "admin",
+			    "replacementSpan": {
+			      "length": 0,
+			      "start": 90,
+			    },
+			    "sortText": "11",
+			  },
+			  {
+			    "commitCharacters": [],
+			    "kind": "string",
+			    "kindModifiers": "",
+			    "name": "user",
+			    "replacementSpan": {
+			      "length": 0,
+			      "start": 90,
+			    },
+			    "sortText": "11",
+			  },
+			]
+		`);
+	expect(completions?.entries.length).toBe(2);
+	expect(completions?.entries.some((e) => e.name === "admin")).toBe(true);
+	expect(completions?.entries.some((e) => e.name === "user")).toBe(true);
+});
+
+describe("PropertyAccessExpression", () => {
+	test("native suggestions on right side", () => {
+		const string = `
+		interface Options {
+			enableLogs?: boolean;
+			hideSuggestionsIfLessThan?: number;
+		}
+
+		const obj: Options = {} as Options;
+		obj.e
+
+		`;
+		const index = string.length - 4;
+		expect(showCaret(string, index)).toMatchInlineSnapshot(`
+			"
+					interface Options {
+						enableLogs?: boolean;
+						hideSuggestionsIfLessThan?: number;
+					}
+
+					const obj: Options = {} as Options;
+					obj.e|
+
+					"
+		`);
+
+		const completions = getCompletions(
+			{ sourceCode: string, position: index },
+			{ enableLogs: false },
+		);
+
+		expect(completions?.entries).toMatchInlineSnapshot(`
+			[
+			  {
+			    "commitCharacters": undefined,
+			    "data": undefined,
+			    "filterText": undefined,
+			    "hasAction": undefined,
+			    "insertText": undefined,
+			    "isImportStatementCompletion": undefined,
+			    "isPackageJsonImport": undefined,
+			    "isRecommended": undefined,
+			    "isSnippet": undefined,
+			    "kind": "property",
+			    "kindModifiers": "optional",
+			    "labelDetails": undefined,
+			    "name": "enableLogs",
+			    "replacementSpan": undefined,
+			    "sortText": "11",
+			    "source": undefined,
+			    "sourceDisplay": undefined,
+			  },
+			  {
+			    "commitCharacters": undefined,
+			    "data": undefined,
+			    "filterText": undefined,
+			    "hasAction": undefined,
+			    "insertText": undefined,
+			    "isImportStatementCompletion": undefined,
+			    "isPackageJsonImport": undefined,
+			    "isRecommended": undefined,
+			    "isSnippet": undefined,
+			    "kind": "property",
+			    "kindModifiers": "optional",
+			    "labelDetails": undefined,
+			    "name": "hideSuggestionsIfLessThan",
+			    "replacementSpan": undefined,
+			    "sortText": "11",
+			    "source": undefined,
+			    "sourceDisplay": undefined,
+			  },
+			]
+		`);
+		expect(completions?.entries.length).toBe(2);
+		expect(completions?.entries.some((e) => e.name === "enableLogs")).toBe(
+			true,
+		);
+	});
+
+	test("native suggestions on nested right side", () => {
+		const string = `
+		interface Options {
+			enableLogs?: boolean;
+			hideSuggestionsIfLessThan?: number;
+		}
+
+		const obj: Options = {} as Options;
+		const aaa = { bbb: { obj }}
+		aaa.bbb.obj.
+
+		`;
+		const index = string.length - 4;
+		expect(showCaret(string, index)).toMatchInlineSnapshot(`
+			"
+					interface Options {
+						enableLogs?: boolean;
+						hideSuggestionsIfLessThan?: number;
+					}
+
+					const obj: Options = {} as Options;
+					const aaa = { bbb: { obj }}
+					aaa.bbb.obj.|
+
+					"
+		`);
+
+		const completions = getCompletions(
+			{ sourceCode: string, position: index },
+			{ enableLogs: false },
+		);
+
+		expect(completions?.entries).toMatchInlineSnapshot(`
+			[
+			  {
+			    "commitCharacters": undefined,
+			    "data": undefined,
+			    "filterText": undefined,
+			    "hasAction": undefined,
+			    "insertText": undefined,
+			    "isImportStatementCompletion": undefined,
+			    "isPackageJsonImport": undefined,
+			    "isRecommended": undefined,
+			    "isSnippet": undefined,
+			    "kind": "property",
+			    "kindModifiers": "optional",
+			    "labelDetails": undefined,
+			    "name": "enableLogs",
+			    "replacementSpan": undefined,
+			    "sortText": "11",
+			    "source": undefined,
+			    "sourceDisplay": undefined,
+			  },
+			  {
+			    "commitCharacters": undefined,
+			    "data": undefined,
+			    "filterText": undefined,
+			    "hasAction": undefined,
+			    "insertText": undefined,
+			    "isImportStatementCompletion": undefined,
+			    "isPackageJsonImport": undefined,
+			    "isRecommended": undefined,
+			    "isSnippet": undefined,
+			    "kind": "property",
+			    "kindModifiers": "optional",
+			    "labelDetails": undefined,
+			    "name": "hideSuggestionsIfLessThan",
+			    "replacementSpan": undefined,
+			    "sortText": "11",
+			    "source": undefined,
+			    "sourceDisplay": undefined,
+			  },
+			]
+		`);
+		expect(completions?.entries.length).toBe(2);
+		expect(completions?.entries.some((e) => e.name === "enableLogs")).toBe(
+			true,
+		);
+	});
+
+	test("filtered suggestions on root of left side", () => {
+		const string = `
+		interface Options {
+			enableLogs?: boolean;
+			hideSuggestionsIfLessThan?: number;
+		}
+
+		const obj: Options = {} as Options;
+		obj.e
+
+		`;
+		const index = string.length - 6;
+		expect(showCaret(string, index)).toMatchInlineSnapshot(`
+			"
+					interface Options {
+						enableLogs?: boolean;
+						hideSuggestionsIfLessThan?: number;
+					}
+
+					const obj: Options = {} as Options;
+					obj|.e
+
+					"
+		`);
+
+		const completions = getCompletions(
+			{ sourceCode: string, position: index },
+			{ keepKeywords: false, enableLogs: false },
+		);
+
+		expect(completions?.entries).toMatchInlineSnapshot(`
+			[
+			  {
+			    "commitCharacters": undefined,
+			    "data": undefined,
+			    "filterText": undefined,
+			    "hasAction": undefined,
+			    "insertText": undefined,
+			    "isImportStatementCompletion": undefined,
+			    "isPackageJsonImport": undefined,
+			    "isRecommended": undefined,
+			    "isSnippet": undefined,
+			    "kind": "const",
+			    "kindModifiers": "",
+			    "labelDetails": undefined,
+			    "name": "obj",
+			    "replacementSpan": undefined,
+			    "sortText": "11",
+			    "source": undefined,
+			    "sourceDisplay": undefined,
+			  },
+			  {
+			    "commitCharacters": undefined,
+			    "data": undefined,
+			    "filterText": undefined,
+			    "hasAction": undefined,
+			    "insertText": undefined,
+			    "isImportStatementCompletion": undefined,
+			    "isPackageJsonImport": undefined,
+			    "isRecommended": undefined,
+			    "isSnippet": undefined,
+			    "kind": "var",
+			    "kindModifiers": "declare",
+			    "labelDetails": undefined,
+			    "name": "Object",
+			    "replacementSpan": undefined,
+			    "sortText": "15",
+			    "source": undefined,
+			    "sourceDisplay": undefined,
+			  },
+			]
+		`);
+		expect(completions?.entries.length).toBe(2);
+		expect(completions?.entries.some((e) => e.name === "enableLogs")).toBe(
+			false,
+		);
 	});
 });

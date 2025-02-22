@@ -1,5 +1,5 @@
 import * as ts from "typescript/lib/tsserverlibrary";
-import { resolvePluginConfig } from "./config";
+import { resolvePluginConfig, type IntellisensePluginConfig } from "./config";
 import { filterSuggestions } from "./filter-suggestions";
 import { findWordAt } from "./find-word-boundary";
 import { keepPreferredSourceOnly } from "./keep-preferred-source-only";
@@ -10,11 +10,14 @@ const isTest = process?.env?.["VITEST"];
 function init(_modules: { typescript: typeof ts }) {
 	// const ts = modules.typescript;
 
+	let config: Required<IntellisensePluginConfig>;
+	let logger: (...args: any[]) => void = () => void 0;
+
 	function create(info: ts.server.PluginCreateInfo): ts.LanguageService {
-		const config = resolvePluginConfig(info.config);
+		config = resolvePluginConfig(info.config);
 		const enableLogs = config.enableLogs ?? isTest;
 
-		const logger = info?.project?.projectService?.logger?.info
+		logger = info?.project?.projectService?.logger?.info
 			? (...args: any[]) => {
 					if (!enableLogs) return;
 
@@ -48,28 +51,96 @@ function init(_modules: { typescript: typeof ts }) {
 			const content = sourceFile?.getFullText();
 			if (!sourceFile || !content) return;
 
-			const currentNode = getChildAtPos(sourceFile, position);
-			const importDeclaration = findAncestor(currentNode, (node) => {
+			let currentNode = getChildAtPos(sourceFile, position);
+			if (currentNode?.kind === ts.SyntaxKind.EndOfFileToken) {
+				currentNode = getChildAtPos(sourceFile, position - 1);
+				if (currentNode?.kind === ts.SyntaxKind.DotToken) {
+					currentNode = getChildAtPos(sourceFile, position - 2);
+				}
+			}
+
+			const stringOrImportAncestor = findAncestor(currentNode, (node) => {
 				enableLogs === "debug" &&
 					logger(
 						"node",
-						JSON.stringify({ kind: node.kind, text: node.getText() }, null, 2),
+						JSON.stringify(
+							{
+								kind: node.kind,
+								kindName: ts.SyntaxKind[node.kind],
+								text: node.getText(),
+							},
+							null,
+							2,
+						),
 					);
-				return node.kind === ts.SyntaxKind.ImportDeclaration;
+
+				return (
+					node.kind === ts.SyntaxKind.ImportDeclaration ||
+					//
+					node.kind === ts.SyntaxKind.StringLiteral ||
+					node.kind === ts.SyntaxKind.NumericLiteral ||
+					//
+					node.kind === ts.SyntaxKind.NoSubstitutionTemplateLiteral ||
+					node.kind === ts.SyntaxKind.TemplateHead ||
+					node.kind === ts.SyntaxKind.TemplateExpression
+				);
 			});
 
 			enableLogs === "debug" &&
 				logger(
 					"currentNode",
-					JSON.stringify({
-						position,
-						kind: currentNode?.kind,
-						text: currentNode?.getText(),
-					}),
+					currentNode
+						? JSON.stringify({
+								position,
+								kind: currentNode.kind,
+								kindName: ts.SyntaxKind[currentNode.kind],
+								text: currentNode.getText(),
+							})
+						: "_none_",
 				);
 
-			if (importDeclaration) {
-				logger("case:0:in-import-declaration", importDeclaration.getText());
+			if (stringOrImportAncestor) {
+				logger(
+					"case:0:current-should-have-native-suggestions",
+					stringOrImportAncestor.getText(),
+				);
+				return info.languageService.getCompletionsAtPosition(
+					fileName,
+					position,
+					options,
+				);
+			}
+
+			let shouldHaveNativeSuggestions = false;
+			const unwrappedNode = currentNode && unwrapExpression(currentNode);
+			const parent = unwrappedNode?.parent;
+			if (parent) {
+				logger(
+					"case:01:maybe-parent-should-have-native-suggestions",
+					unwrappedNode.getText(),
+				);
+				const unwrappedParent = unwrapExpression(parent);
+
+				// aaa.|
+				if (unwrappedParent.kind === ts.SyntaxKind.PropertyAccessExpression) {
+					const unwrappedGrandParent = unwrapExpression(unwrappedParent.parent);
+
+					// aaa.| is fine
+					// aaa|. is NOT fine
+					// aaa.bbb.| is fine
+					// aaa.|bbb. is fine
+					if (
+						unwrappedGrandParent.kind !== ts.SyntaxKind.ExpressionStatement ||
+						(unwrappedParent as ts.PropertyAccessExpression).name ===
+							unwrappedNode
+					) {
+						shouldHaveNativeSuggestions = true;
+					}
+				}
+			}
+
+			if (shouldHaveNativeSuggestions) {
+				logger("case:01:parent-should-have-native-suggestions");
 				return info.languageService.getCompletionsAtPosition(
 					fileName,
 					position,
@@ -208,3 +279,42 @@ function init(_modules: { typescript: typeof ts }) {
 }
 
 export = init;
+
+const getKindName = (node: ts.Node) => ts.SyntaxKind[node.kind];
+const debugNode = (node: ts.Node) => ({
+	kindName: getKindName(node),
+	text: node.getText(),
+});
+
+/**
+ * adapted my own code (without ts-morph) from
+ * @see https://github.com/chakra-ui/panda/blob/029d2eb190bbc653a4fe54a62f009078b3a6e3fa/packages/extractor/src/utils.ts#L24
+ */
+const unwrapExpression = (node: ts.Node): ts.Node => {
+	// Object as any => Object
+	if (node.kind === ts.SyntaxKind.AsExpression) {
+		return unwrapExpression((node as ts.AsExpression).expression);
+	}
+
+	// (Object) => Object
+	if (node.kind === ts.SyntaxKind.ParenthesizedExpression) {
+		return unwrapExpression((node as ts.ParenthesizedExpression).expression);
+	}
+
+	// "red"! => "red"
+	if (node.kind === ts.SyntaxKind.NonNullExpression) {
+		return unwrapExpression((node as ts.NonNullExpression).expression);
+	}
+
+	// <T>Object => Object
+	if (node.kind === ts.SyntaxKind.TypeAssertionExpression) {
+		return unwrapExpression((node as ts.TypeAssertion).expression);
+	}
+
+	// xxx satisfies yyy -> xxx
+	if (node.kind === ts.SyntaxKind.SatisfiesExpression) {
+		return unwrapExpression((node as ts.SatisfiesExpression).expression);
+	}
+
+	return node;
+};
