@@ -16,4 +16,7 @@ type Pattern = `${Role} oui`;
 const oui: Pattern = `admin oui`;
 
 nested.inside;
+// nested.inside.;
 // nested.
+// nested.inside.obj.
+// nested?.o

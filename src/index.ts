@@ -55,9 +55,6 @@ function init(_modules: { typescript: typeof ts }) {
 			let currentNode = getChildAtPos(sourceFile, position);
 			if (currentNode?.kind === ts.SyntaxKind.EndOfFileToken) {
 				currentNode = getChildAtPos(sourceFile, position - 1);
-				if (currentNode?.kind === ts.SyntaxKind.DotToken) {
-					currentNode = getChildAtPos(sourceFile, position - 2);
-				}
 			}
 
 			const stringOrImportAncestor = findAncestor(currentNode, (node) => {
@@ -121,22 +118,36 @@ function init(_modules: { typescript: typeof ts }) {
 					unwrappedNode.getText(),
 				);
 				const unwrappedParent = unwrapExpression(parent);
+				// console.log({
+				// 	unwrappedParent: debugNode(unwrappedParent),
+				// 	unwrappedNode: debugNode(unwrappedNode),
+				// 	expr:
+				// 		(unwrappedNode as ts.ExpressionStatement).expression &&
+				// 		debugNode((unwrappedNode as ts.ExpressionStatement).expression),
+				// 	namePos:
+				// 		(unwrappedNode as ts.PropertyAccessExpression).name &&
+				// 		(unwrappedNode as ts.PropertyAccessExpression).name.pos,
+				// 	position: position,
+				// });
 
 				// aaa.|
-				if (unwrappedParent.kind === ts.SyntaxKind.PropertyAccessExpression) {
-					const unwrappedGrandParent = unwrapExpression(unwrappedParent.parent);
-
-					// aaa.| is fine
-					// aaa|. is NOT fine
-					// aaa.bbb.| is fine
-					// aaa.|bbb. is fine
-					if (
-						unwrappedGrandParent.kind !== ts.SyntaxKind.ExpressionStatement ||
-						(unwrappedParent as ts.PropertyAccessExpression).name ===
-							unwrappedNode
-					) {
-						shouldHaveNativeSuggestions = true;
-					}
+				if (
+					unwrappedNode.kind === ts.SyntaxKind.ExpressionStatement &&
+					(unwrappedNode as ts.ExpressionStatement).expression.kind ===
+						ts.SyntaxKind.PropertyAccessExpression
+				) {
+					// nested.inside.|;
+					// nested.inside.obj?.|;
+					// nested.inside.obj!.;
+					shouldHaveNativeSuggestions = true;
+				} else if (
+					unwrappedParent.kind === ts.SyntaxKind.ExpressionStatement &&
+					unwrappedNode.kind === ts.SyntaxKind.PropertyAccessExpression &&
+					(unwrappedNode as ts.PropertyAccessExpression).expression.kind ===
+						ts.SyntaxKind.PropertyAccessExpression
+				) {
+					// aaa.bbb.obj.|
+					shouldHaveNativeSuggestions = true;
 				}
 			}
 

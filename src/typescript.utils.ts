@@ -1,4 +1,5 @@
 import {
+	forEachChild,
 	isJSDocCommentContainingNode,
 	isToken,
 	SyntaxKind,
@@ -9,7 +10,28 @@ import {
 } from "typescript";
 
 export function getChildAtPos(from: SourceFile, pos: number): Node | undefined {
-	return getTokenAtPositionWorker(from, pos, true, undefined, false);
+	return getNodeAtPosition(from, pos);
+}
+
+/** Returns a token if position is in [start-of-leading-trivia, end), includes JSDoc only in JS files */
+function getNodeAtPosition(sourceFile: SourceFile, position: number): Node {
+	let current: Node = sourceFile;
+	const getContainingChild = (child: Node) => {
+		if (
+			child.pos <= position &&
+			(position < child.end ||
+				(position === child.end && child.kind === SyntaxKind.EndOfFileToken))
+		) {
+			return child;
+		}
+	};
+	while (true) {
+		const child = forEachChild(current, getContainingChild);
+		if (!child) {
+			return current;
+		}
+		current = child;
+	}
 }
 
 /* -----------------------------------------------------------------------------
@@ -204,12 +226,14 @@ function findPrecedingToken(
 }
 
 /** Get the token whose text contains the position */
-function getTokenAtPositionWorker(
+export function getTokenAtPositionWorker(
 	sourceFile: SourceFile,
 	position: number,
-	allowPositionInLeadingTrivia: boolean,
-	includePrecedingTokenAtEndPosition: ((n: Node) => boolean) | undefined,
-	includeEndPosition: boolean,
+	allowPositionInLeadingTrivia: boolean = false,
+	includePrecedingTokenAtEndPosition:
+		| ((n: Node) => boolean)
+		| undefined = undefined,
+	includeEndPosition: boolean = false,
 ): Node {
 	let current: Node = sourceFile;
 	let foundToken: Node | undefined;

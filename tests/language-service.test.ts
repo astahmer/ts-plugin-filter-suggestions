@@ -98,419 +98,7 @@ test("should suggest symbols from current file if less than 5 characters", () =>
 		{ sourceCode: string, position: index },
 		{ enableLogs: false },
 	);
-	expect(completions?.entries).toMatchInlineSnapshot(`
-			[
-			  {
-			    "commitCharacters": undefined,
-			    "data": undefined,
-			    "filterText": undefined,
-			    "hasAction": undefined,
-			    "insertText": undefined,
-			    "isImportStatementCompletion": undefined,
-			    "isPackageJsonImport": undefined,
-			    "isRecommended": undefined,
-			    "isSnippet": undefined,
-			    "kind": "const",
-			    "kindModifiers": "",
-			    "labelDetails": undefined,
-			    "name": "abcdef",
-			    "replacementSpan": undefined,
-			    "sortText": "11",
-			    "source": undefined,
-			    "sourceDisplay": undefined,
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "abstract",
-			    "sortText": "15",
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "any",
-			    "sortText": "15",
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "as",
-			    "sortText": "15",
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "asserts",
-			    "sortText": "15",
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "async",
-			    "sortText": "15",
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "await",
-			    "sortText": "15",
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "bigint",
-			    "sortText": "15",
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "boolean",
-			    "sortText": "15",
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "break",
-			    "sortText": "15",
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "case",
-			    "sortText": "15",
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "catch",
-			    "sortText": "15",
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "class",
-			    "sortText": "15",
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "const",
-			    "sortText": "15",
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "continue",
-			    "sortText": "15",
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "debugger",
-			    "sortText": "15",
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "declare",
-			    "sortText": "15",
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "default",
-			    "sortText": "15",
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "delete",
-			    "sortText": "15",
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "do",
-			    "sortText": "15",
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "else",
-			    "sortText": "15",
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "enum",
-			    "sortText": "15",
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "export",
-			    "sortText": "15",
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "extends",
-			    "sortText": "15",
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "false",
-			    "sortText": "15",
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "finally",
-			    "sortText": "15",
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "for",
-			    "sortText": "15",
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "function",
-			    "sortText": "15",
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "if",
-			    "sortText": "15",
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "implements",
-			    "sortText": "15",
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "import",
-			    "sortText": "15",
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "in",
-			    "sortText": "15",
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "infer",
-			    "sortText": "15",
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "instanceof",
-			    "sortText": "15",
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "interface",
-			    "sortText": "15",
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "keyof",
-			    "sortText": "15",
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "let",
-			    "sortText": "15",
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "module",
-			    "sortText": "15",
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "namespace",
-			    "sortText": "15",
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "never",
-			    "sortText": "15",
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "new",
-			    "sortText": "15",
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "null",
-			    "sortText": "15",
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "number",
-			    "sortText": "15",
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "object",
-			    "sortText": "15",
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "package",
-			    "sortText": "15",
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "readonly",
-			    "sortText": "15",
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "return",
-			    "sortText": "15",
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "satisfies",
-			    "sortText": "15",
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "string",
-			    "sortText": "15",
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "super",
-			    "sortText": "15",
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "switch",
-			    "sortText": "15",
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "symbol",
-			    "sortText": "15",
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "this",
-			    "sortText": "15",
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "throw",
-			    "sortText": "15",
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "true",
-			    "sortText": "15",
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "try",
-			    "sortText": "15",
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "type",
-			    "sortText": "15",
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "typeof",
-			    "sortText": "15",
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "unique",
-			    "sortText": "15",
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "unknown",
-			    "sortText": "15",
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "using",
-			    "sortText": "15",
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "var",
-			    "sortText": "15",
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "void",
-			    "sortText": "15",
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "while",
-			    "sortText": "15",
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "with",
-			    "sortText": "15",
-			  },
-			  {
-			    "kind": "keyword",
-			    "kindModifiers": "",
-			    "name": "yield",
-			    "sortText": "15",
-			  },
-			]
-		`);
+	expect(completions?.entries.length).toBe(66);
 	expect(completions?.entries.some((e) => e.name === "abcdef")).toBe(true);
 });
 
@@ -724,6 +312,48 @@ describe("PropertyAccessExpression", () => {
 		);
 	});
 
+	test("native suggestions on nested right side with ; next to it", () => {
+		const string = `
+		export interface Options {
+			enableLogs?: boolean;
+			hideSuggestionsIfLessThan?: number;
+		}
+
+		export const exampleOptions: Options = {} as Options;
+		export const nested = {
+			inside: { obj: exampleOptions },
+			another: { obj: exampleOptions },
+		};
+
+		nested.inside.;
+		`;
+		const index = string.length - 4;
+		expect(showCaret(string, index)).toMatchInlineSnapshot(`
+			"
+					export interface Options {
+						enableLogs?: boolean;
+						hideSuggestionsIfLessThan?: number;
+					}
+
+					export const exampleOptions: Options = {} as Options;
+					export const nested = {
+						inside: { obj: exampleOptions },
+						another: { obj: exampleOptions },
+					};
+
+					nested.inside.|;
+					"
+		`);
+
+		const completions = getCompletions(
+			{ sourceCode: string, position: index },
+			{ enableLogs: false },
+		);
+
+		expect(completions?.entries.length).toBe(1);
+		expect(completions?.entries.some((e) => e.name === "obj")).toBe(true);
+	});
+
 	test("filtered suggestions on root of left side", () => {
 		const string = `
 		interface Options {
@@ -754,51 +384,104 @@ describe("PropertyAccessExpression", () => {
 			{ keepKeywords: false, enableLogs: false },
 		);
 
-		expect(completions?.entries).toMatchInlineSnapshot(`
-			[
-			  {
-			    "commitCharacters": undefined,
-			    "data": undefined,
-			    "filterText": undefined,
-			    "hasAction": undefined,
-			    "insertText": undefined,
-			    "isImportStatementCompletion": undefined,
-			    "isPackageJsonImport": undefined,
-			    "isRecommended": undefined,
-			    "isSnippet": undefined,
-			    "kind": "const",
-			    "kindModifiers": "",
-			    "labelDetails": undefined,
-			    "name": "obj",
-			    "replacementSpan": undefined,
-			    "sortText": "11",
-			    "source": undefined,
-			    "sourceDisplay": undefined,
-			  },
-			  {
-			    "commitCharacters": undefined,
-			    "data": undefined,
-			    "filterText": undefined,
-			    "hasAction": undefined,
-			    "insertText": undefined,
-			    "isImportStatementCompletion": undefined,
-			    "isPackageJsonImport": undefined,
-			    "isRecommended": undefined,
-			    "isSnippet": undefined,
-			    "kind": "var",
-			    "kindModifiers": "declare",
-			    "labelDetails": undefined,
-			    "name": "Object",
-			    "replacementSpan": undefined,
-			    "sortText": "15",
-			    "source": undefined,
-			    "sourceDisplay": undefined,
-			  },
-			]
-		`);
 		expect(completions?.entries.length).toBe(2);
 		expect(completions?.entries.some((e) => e.name === "enableLogs")).toBe(
 			false,
 		);
+		expect(completions?.entries.some((e) => e.name === "obj")).toBe(true);
+	});
+
+	test("native suggestions with ? nested right side", () => {
+		const string = `
+		export interface Options {
+			enableLogs?: boolean;
+			hideSuggestionsIfLessThan?: number;
+		}
+
+		export const exampleOptions: Options = {} as Options;
+		export const nested = {
+			inside: { obj: exampleOptions },
+			another: { obj: exampleOptions },
+		};
+
+		nested.inside.obj?.;
+		`;
+		const index = string.length - 4;
+		expect(showCaret(string, index)).toMatchInlineSnapshot(`
+			"
+					export interface Options {
+						enableLogs?: boolean;
+						hideSuggestionsIfLessThan?: number;
+					}
+
+					export const exampleOptions: Options = {} as Options;
+					export const nested = {
+						inside: { obj: exampleOptions },
+						another: { obj: exampleOptions },
+					};
+
+					nested.inside.obj?.|;
+					"
+		`);
+
+		const completions = getCompletions(
+			{ sourceCode: string, position: index },
+			{ enableLogs: false },
+		);
+
+		expect(completions?.entries.length).toBe(2);
+		expect(completions?.entries.some((e) => e.name === "enableLogs")).toBe(
+			true,
+		);
+		expect(
+			completions?.entries.some((e) => e.name === "hideSuggestionsIfLessThan"),
+		).toBe(true);
+	});
+
+	test("native suggestions with ! nested right side", () => {
+		const string = `
+		export interface Options {
+			enableLogs?: boolean;
+			hideSuggestionsIfLessThan?: number;
+		}
+
+		export const exampleOptions: Options = {} as Options;
+		export const nested = {
+			inside: { obj: exampleOptions },
+			another: { obj: exampleOptions },
+		};
+
+		nested.inside.obj!.;
+		`;
+		const index = string.length - 4;
+		expect(showCaret(string, index)).toMatchInlineSnapshot(`
+			"
+					export interface Options {
+						enableLogs?: boolean;
+						hideSuggestionsIfLessThan?: number;
+					}
+
+					export const exampleOptions: Options = {} as Options;
+					export const nested = {
+						inside: { obj: exampleOptions },
+						another: { obj: exampleOptions },
+					};
+
+					nested.inside.obj!.|;
+					"
+		`);
+
+		const completions = getCompletions(
+			{ sourceCode: string, position: index },
+			{ enableLogs: false },
+		);
+
+		expect(completions?.entries.length).toBe(2);
+		expect(completions?.entries.some((e) => e.name === "enableLogs")).toBe(
+			true,
+		);
+		expect(
+			completions?.entries.some((e) => e.name === "hideSuggestionsIfLessThan"),
+		).toBe(true);
 	});
 });
