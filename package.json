@@ -1,7 +1,7 @@
 {
 	"name": "ts-plugin-filter-suggestions",
 	"description": "A TypeScript Language Service Plugin that allows configuring filters for suggestions",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"main": "./out/index.js",
 	"scripts": {
 		"build": "tsc",
